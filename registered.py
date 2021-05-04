@@ -18,9 +18,10 @@ class registered:
 
         self.ui.stackedWidget.setCurrentWidget(self.ui.homepage)
 #to generate user information like their name
-        self.generateUserName()
+        self.generateUserName("al001@gmail.com")
         self.generateTopOSHomepage()
         self.generateTopSellersHomepage()
+        self.readInventoryTextFile()
     
 
 #-----homepage navigation bar, home, profile, cart, help
@@ -46,7 +47,6 @@ class registered:
         self.ui.productBuyButton.clicked.connect(self.buy_item)
         
         
-
 #-------------profilepage relationships using stackedWidget2 -------------
 
 #-----navigation bar on profile page
@@ -154,9 +154,9 @@ class registered:
    
         
 
-#-----will generate the customer my account page based on a users email
-    def generateUserName(self):
-        search = "al001@gmail.com"
+#-----will generate the customer my account page based on a users email which will be input to the function
+    def generateUserName(self, email):
+        search = email
         myfile = open("userInfo.txt", "r")
         lines = myfile.readlines()
         
@@ -181,267 +181,300 @@ class registered:
 
     #will generate the top os on the homepage
     def generateTopOSHomepage(self):
-        myfile = open("topOperatingSystems.txt", "r")
-        
         osImageButtons = [self.ui.OSimagbutton1, self.ui.OSimagbutton2, self.ui.OSimagbutton3]
         osTitles = [self.ui.OStitle1, self.ui.OStitle2, self.ui.OStitle3]
         osButton = [self.ui.seeProductsButton1, self.ui.seeProductsButton2, self.ui.seeProductsButton3]
 
-        lines = myfile.readlines() #list of lines
+        osArray = self.readTopOS()
         index = 0
-        for singleLine in lines: #breaks the list down to lines
-            newline = singleLine.strip() #strips the "\n" from the strings line
-            userList = newline.split(", ") #strips strings by the ", " deliminter 2 elements per line now added to new list
-            
-            osTitle = userList[0] #refers to the OS Name
+        for os in osArray: #breaks the list down to lines
+            osTitle = os.getName() #refers to the OS Name
             osTitles[index].setText(osTitle)  #sets the OS Name on the homepage
 
-            osImage = userList[1]  #refers to the OS Image
+            osImage = os.getImage()  #refers to the OS Image
             osImageButtons[index].setIcon(QtGui.QIcon(osImage))  #sets the OS Image on the homepage
             
             self.generateTopOSPages(osTitle, index) #repeats 3 times for each OS, will find items asscociated to OS to write onto OS page
             index = index + 1
-        myfile.close()
+        self.ui.topOSLabel.setStyleSheet("font-size: 30pt; text-align: center;")
+        self.ui.topSelleLabel.setStyleSheet("font-size: 30pt; text-align: center;")
     
-   
-        
-    # function will take in one OS i value from 0 to 2 and determine from the items in inventory if they match to the OS
-    def generateTopOSPages(self, osTitle, i):
+    #will read the top OS file and create topOS objects
+    def readTopOS(self):
+        myfile = open("topOperatingSystems.txt", "r")
+        osArray = []
+        lines = myfile.readlines() #list of lines
+        index = 0
+        for singleLine in lines: #breaks the list down to lines
+            newline = singleLine.strip() #strips the "\n" from the strings line
+            os = newline.split(", ") #strips strings by the ", " delimiter 2 elements per line now added to new list
+            osArray.append(topOS(os[0], os[1])) #array of item objects #adds the item objects to an array
+        return osArray
+
+    def generateTopOSPages(self, osTitle, i): # will take in one OS i value from 0 to 2 and determine from the items in inventory if they match to the OS
     
         osImageButtons = [self.ui.OSimagbutton1, self.ui.OSimagbutton2, self.ui.OSimagbutton3] #array of OS image buttons
         seeProductsButtons = [self.ui.seeProductsButton1, self.ui.seeProductsButton2, self.ui.seeProductsButton3] #array of see products  buttons
         showOSpageFunctions = [self.show_OS1_page, self.show_OS2_page, self.show_OS3_page] #array OS pages
         osPageTitles =  [self.ui.OS1Title, self.ui.OS2Title, self.ui.OS3Title] # array for the titles of the OS pages
-      
+        
+        
         osImageButtons[i].clicked.connect(showOSpageFunctions[i]) #connects the operating system image to it's page
         seeProductsButtons[i].clicked.connect(showOSpageFunctions[i]) #connects the operating system see products button to it's page
-        itemsArray = [] # will store the items matched to an OS
-        position = [] # will store the index value of the matched items contained in itemsArray
+        itemsArray = []
+        position = []
         
         myfile = open("inventory.txt", "r")
         lines = myfile.readlines() #list of lines
         index = 0
         for singleLine in lines: #breaks the list down to lines
             newline = singleLine.strip() #strips the "\n" from the strings line
-            item = newline.split(", ") #strips strings by the ", " delimiter 6 elements per line now added to new list
+            item = newline.split(", ") #strips strings by the ", " deliminter 6 elements per line now added to new list
             os = item[5].lower() #refers to OS Type of the product to see if we can find a subset with the name of the operating system file
             if (os == osTitle.lower()): #items are found with the OS type attribute of the item
+ 
                 itemsArray.append(item[1]) # add the items ID number to a list
                 position.append(index)
             index = index + 1
-
+ 
         if i == 0:
-            self.generateTopOS1Page(itemsArray, position, index)
+            self.generateTopOS1Page(itemsArray, position)
         elif i == 1:
-            self.generateTopOS2Page(itemsArray, position, index)
+            self.generateTopOS2Page(itemsArray, position)
         else:
-            self.generateTopOS3Page(itemsArray, position, index)
-
+            self.generateTopOS3Page(itemsArray, position)
+ 
+        
+ 
         osPageTitles[i].setText(osTitle) #sets the title of the page based on the tile of the OS selected
+ 
         myfile.close()
         return position
+ 
 
     #generates top OS 1 page
-    def generateTopOS1Page(self, matchedItems, matchedPosition, totalItems):
+    def generateTopOS1Page(self, matchedItems, matchedPosition):
 
         os1PageImageButton = [self.ui.OS1Image1, self.ui.OS1Image2, self.ui.OS1Image3, self.ui.OS1Image4, self.ui.OS1Image5, self.ui.OS1Image6]  #ui objects for top OS products images
         os1ItemNames = [self.ui.OS1name1, self.ui.OS1name2, self.ui.OS1name3, self.ui.OS1name4, self.ui.OS1name5, self.ui.OS1name6] #ui objects for top OS products names
         os1ItemPrice = [self.ui.OS1price1, self.ui.OS1price2, self.ui.OS1price3, self.ui.OS1price4, self.ui.OS1price5, self.ui.OS1price6] #ui objects for top OS products prices
+        self.matchOS(os1ItemNames, os1ItemPrice, os1PageImageButton, matchedItems, matchedPosition)
 
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
-        count = 0 # to repeat the for loop
-        # will traverse through the lines in the textfile and store the matched items to the associated Operating system
-        while count <= len(matchedItems) -1:
-            index = matchedPosition[count]
-            newline = lines[index].strip()
-            item = newline.split(", ")
-            
-            itemName = item[0] #refers to the name
-            os1ItemNames[count].setText(itemName)
-            os1ItemNames[count].setStyleSheet("font-size: 25pt;")
-
-
-            itemPrice = item[2] #refers to the price
-            os1ItemPrice[count].setText(itemPrice)
-            os1ItemPrice[count].setStyleSheet("font-size: 25pt;")
-
-
-            itemImage= item[4] #refers to the image
-            os1PageImageButton[count].setIcon(QtGui.QIcon(itemImage))
-            os1PageImageButton[count].setIconSize(QtCore.QSize(300, 200))
-
-            count = count + 1
-
-        myfile.close()
-    
     
     #generates top OS 2 page
-    def generateTopOS2Page(self, matchedItems, matchedPosition, totalItems):
+    def generateTopOS2Page(self, matchedItems, matchedPosition):
             
         os2PageImageButton = [self.ui.OS2Image1, self.ui.OS2Image2, self.ui.OS2Image3, self.ui.OS2Image4, self.ui.OS2Image5, self.ui.OS2Image6]  #ui objects for top OS products images
         os2ItemNames = [self.ui.OS2name1, self.ui.OS2name2, self.ui.OS2name3, self.ui.OS2name4, self.ui.OS2name5, self.ui.OS2name6] #ui objects for top OS products names
         os2ItemPrice = [self.ui.OS2price1, self.ui.OS2price2, self.ui.OS2price3, self.ui.OS2price4, self.ui.OS2price5, self.ui.OS2price6] #ui objects for top OS products prices
+        self.matchOS(os2ItemNames, os2ItemPrice, os2PageImageButton, matchedItems, matchedPosition)
 
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
-        count = 0 # to repeat the for loop
-        # will traverse throught the lines in the textfile and store the matched items to the associated Operating system
-        while count <= len(matchedItems) -1:
-            index = matchedPosition[count]
-            newline = lines[index].strip()
-            item = newline.split(", ")
-            
-            itemName = item[0] #refers to the name
-            os2ItemNames[count].setText(itemName)
-            os2ItemNames[count].setStyleSheet("font-size: 25pt;")
-
-            itemPrice = item[2] #refers to the price
-            os2ItemPrice[count].setText(itemPrice) #refers to the price
-            os2ItemPrice[count].setStyleSheet("font-size: 25pt;")
-
-            itemImage= item[4] #refers to the image
-            os2PageImageButton[count].setIcon(QtGui.QIcon(itemImage))
-            os2PageImageButton[count].setIconSize(QtCore.QSize(300, 200))
-
-            count = count + 1
-
-        myfile.close()
         
     #generates top OS 3 page
-    def generateTopOS3Page(self, matchedItems, matchedPosition, totalItems):
+    def generateTopOS3Page(self, matchedItems, matchedPosition):
           
         os3PageImageButton = [self.ui.OS3Image1, self.ui.OS3Image2, self.ui.OS3Image3, self.ui.OS3Image4, self.ui.OS3Image5, self.ui.OS3Image6]  #ui objects for top OS products images
         os3ItemNames = [self.ui.OS3name1, self.ui.OS3name2, self.ui.OS3name3, self.ui.OS3name4, self.ui.OS3name5, self.ui.OS3name6]  #ui objects for top OS products names
         os3ItemPrice = [self.ui.OS3price1, self.ui.OS3price2, self.ui.OS3price3, self.ui.OS3price4, self.ui.OS3price5, self.ui.OS3price6]  #ui objects for top OS products prices
+        self.matchOS(os3ItemNames, os3ItemPrice, os3PageImageButton, matchedItems, matchedPosition)
 
-        # will traverse throught the lines in the textfile and store the matched items to the associated Operating system
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
+    # matches the ui labels and buttons to the object attributes, name, price, image
+    def matchOS(self, uiNameArray, uiPriceArray, uiImageArray, matchedItems, matchedPosition):
+           
+        itemsArray = self.readInventoryTextFile()
         count = 0 # to repeat the for loop
+        #will traverse throught the lines in the textfile and store the matched items to the associated Operating system
         while count <= len(matchedItems) -1:
             index = matchedPosition[count]
-            newline = lines[index].strip()
-            item = newline.split(", ")
-            
-            itemName = item[0] #refers to the name
-            os3ItemNames[count].setText(itemName)
-            os3ItemNames[count].setStyleSheet("font-size: 25pt;")
+            itemObject = itemsArray[index]
 
+            itemName = itemObject.getName() #refers to the name
+            uiNameArray[count].setText(itemName)
+            uiNameArray[count].setStyleSheet("font-size: 25pt;")
 
-            itemPrice = item[2] #refers to the price
-            os3ItemPrice[count].setText(itemPrice)
-            os3ItemPrice[count].setStyleSheet("font-size: 25pt;")
+            itemPrice = itemObject.getPrice() #refers to the price
+            uiPriceArray[count].setText(itemPrice) #refers to the price
+            uiPriceArray[count].setStyleSheet("font-size: 25pt;")
 
-
-            itemImage= item[4] #refers to the image
-            os3PageImageButton[count].setIcon(QtGui.QIcon(itemImage))
-            os3PageImageButton[count].setIconSize(QtCore.QSize(300, 200))
+            itemImage= itemObject.getImage() #refers to the image
+            uiImageArray[count].setIcon(QtGui.QIcon(itemImage))
+            uiImageArray[count].setIconSize(QtCore.QSize(300, 200))
 
             count = count + 1
 
-        myfile.close()
 
 
-    #will generate the top sellers on the homepage by looking into the topSeller.txt
-    def generateTopSellersHomepage(self):
+    #will generate the top sellers on the homepage by looking into the topSeller.txt, creates objects of the items
+    def readTopSellers(self):
         myfile = open("topSeller.txt", "r")
+        topSellerArray = []
         lines = myfile.readlines() #list of lines
-        index = 0
+        
         for singleLine in lines: #breaks the list down to lines should just be one line of 3 product IDs seperated by commas
             newline = singleLine.strip() #strips the "\n" from the strings line
             topSellerItems = newline.split(", ") #strips strings by the ", " delimoiter 2 elements per line now added to new list
             
-            self.generateTopSellersItems(topSellerItems[0], 0) #the first top seller ID sent to function generateTopSellersItems
-            self.generateTopSellersItems(topSellerItems[1], 1) #the second top seller ID sent to function generateTopSellersItems
-            self.generateTopSellersItems(topSellerItems[2], 2) #the third top seller ID sent to function generateTopSellersItems
+            topSellerArray.append(topSeller(topSellerItems[0])) #adds first top seller to array of top seller objects
+            topSellerArray.append(topSeller(topSellerItems[1])) #adds second top seller to array of top seller objects
+            topSellerArray.append(topSeller(topSellerItems[2])) #adds third top seller to array of top seller objects
             
-        myfile.close()
+        return topSellerArray
+        
+    #will generate the top sellers ID by reffering to an array generated by calling the readTopSellers() function
+    def generateTopSellersHomepage(self):
+        topSellerArray = self.readTopSellers()
+        i = 0
+        for item in topSellerArray:
+            self.generateTopSellersItems(item.getID(), i) #the first top seller ID sent to function generateTopSellersItems
+            i += 1
 
-    #will read the first top sellers information from the inventory.txt textfile to write on the homepage
+    # will take as input the top seller ID and match it to the item in the inventory textfile by calling readInventoryTextFile(). The goal is to send the product object to a function that will generate the information onto the homescreen.  A product can be sent to generateTopSeller1Page, generateTopSeller2Page, generateTopSeller3Page
     def generateTopSellersItems(self, itemID, i):
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
+
+        itemsArray = self.readInventoryTextFile()
         index = 0
-        for singleLine in lines: #breaks the list down to lines
-            newline = singleLine.strip() #strips the "\n" from the strings line
-            item = newline.split(", ") #strips strings by the ", " delimiter 6 elements per line now added to new list
-           
-            if (item[1] == itemID): #2nd attribute in inventory.txt is product ID
+        for item in itemsArray: #breaks the list down to seperate product objects
+            if (item.getID() == itemID): #checks if the product object we are looking at in inventory file is a top sellers item
                 if i == 0:
-                    self.generateTopSeller1Page(index) #takes in the parameter index to determine which row to look at within the inventory text file
+                    self.generateTopSeller1Page(item)
                 elif i == 1:
-                    self.generateTopSeller2Page(index)
+                    self.generateTopSeller2Page(item)
                 else:
-                    self.generateTopSeller3Page(index)
+                    self.generateTopSeller3Page(item)
                     
                 break;
                         
             index = index + 1
-        myfile.close()
+
                
-    #will read the first top seller product information from the inventory.txt textfile to write on the homepage
-    def generateTopSeller1Page(self, index):
-    
+    #will record the first top seller product information to write on the homepage
+    def generateTopSeller1Page(self, item):
+        self.matchTopSeller(item, self.ui.topsellername1,  self.ui.topSellerPrice1, self.ui.topSellerImage1)
+
+    #will record the second top seller product information to write on the homepage
+    def generateTopSeller2Page(self, item):
+        self.matchTopSeller(item, self.ui.topsellername2, self.ui.topSellerPrice2, self.ui.topSellerImage2)
+
+
+    #will record the third top seller product information to write on the homepage
+    def generateTopSeller3Page(self, item):
+        self.matchTopSeller(item, self.ui.topsellername3, self.ui.topSellerPrice3, self.ui.topSellerImage3)
+
+
+    #will connect the ui button and labels to the product object attributes
+    def matchTopSeller(self, item, uiName, uiPrice, uiImage):
+        itemName = item.getName() #refers to product name
+        uiName.setText(itemName)
+        uiName.setStyleSheet("font-size: 25pt;")
+
+
+        itemPrice = item.getPrice() #refers to product price
+        uiPrice.setText(itemPrice)
+        uiPrice.setStyleSheet("font-size: 25pt;")
+
+
+        itemImage= item.getImage() #refers to product image
+        uiImage.setIcon(QtGui.QIcon(itemImage))
+        
+    #will read the inventory textfile and create product objects to refer to
+    def readInventoryTextFile(self):
         myfile = open("inventory.txt", "r")
         lines = myfile.readlines() #list of lines
-        elements =  lines[index].strip().split(", ") #refers to specific line of the textfile with the product information
-
-        itemName = elements[0] #refers to product name
-        self.ui.topsellername1.setText(itemName)
-        self.ui.topsellername1.setStyleSheet("font-size: 25pt;")
-
-
-        itemPrice = elements[2] #refers to product price
-        self.ui.topSellerPrice1.setText(itemPrice)
-        self.ui.topSellerPrice1.setStyleSheet("font-size: 25pt;")
-
-
-        itemImage= elements[4] #refers to product image
-        self.ui.topSellerImage1.setIcon(QtGui.QIcon(itemImage))
-
+        index = 0
+        itemArray = [] #to store the item objects
+        for singleLine in lines: #breaks the list down to lines
+            newline = singleLine.strip() #strips the "\n" from the strings line
+            item = newline.split(", ") #strips strings by the ", " deliminter 6 elements per line now added to new list
+            itemArray.append(product(item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])) #array of item objects #adds the item objects to an array
+            index = index + 1
         myfile.close()
+        return itemArray
 
-    #will read the second top seller product information from the inventory.txt textfile to write on the homepage
-    def generateTopSeller2Page(self, index):
+
+class product:
+    def __init__(self, name, ID, price, description, image, OS, itemsSold, quantity):
+        self.name = name
+        self.ID = ID
+        self.price = price
+        self.description = description
+        self.image = image
+        self.OS = OS
+        self.itemsSold = itemsSold
+        self.quantity = quantity
+        self.rate = 0
+        self.totalRatingSum = 0
     
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
-        elements =  lines[index].strip().split(", ") #refers to specific line of the textfile with the product information, elements in the row placed in list called elements
-
-        itemName = elements[0] #refers to product name
-        self.ui.topsellername2.setText(itemName)
-        self.ui.topsellername2.setStyleSheet("font-size: 25pt;")
-
-
-        itemPrice = elements[2]  #refers to product price
-        self.ui.topSellerPrice2.setText(itemPrice)
-        self.ui.topSellerPrice2.setStyleSheet("font-size: 25pt;")
-
-
-        itemImage= elements[4]  #refers to product image
-        self.ui.topSellerImage2.setIcon(QtGui.QIcon(itemImage))
-
-        myfile.close()
-
+    def getName(self):
+        return self.name
+    def getID(self):
+        return(self.ID)
+    def getPrice(self):
+        return self.price
+    def getDescription(self):
+        return self.description
+    def getImage(self):
+        return self.image
+    def getOperatingSystem(self):
+        return self.OS
+    def getItemSold(self):
+        return self.itemsSold
+    def getQuantity(self):
+        return self.quantity
+    def getRate(self):
+        return self.rate
+    def getTotalRatingSum(self):
+        return self.totalRatingSum
+        
+    
+        
+    def setName(self, name):
+        self.name = name
+    def setID(self, ID):
+        self.ID = ID
+    def setPrice(self, price):
+        self.price = price
+    def setDescription(self, description):
+        self.description = description
+    def setImage(self, image):
+        self.image = image
+    def setOS(self, OS):
+        self.OS = OS
+    def setItemSold(self, itemsSold):
+        self.itemsSold = itemsSold
+    def setQuantity(self, quantity):
+        self.quantity = quantity
+    def setRate(self, totalRatingSum, itemsSold):
+        self.rate = totalRatingSum/itemsSold
+    def setTotalRatingSum(self, totalRatingSum):
+        self.totalRatingSum = totalRatingSum
+      
    
-    #will read the third top seller product information from the inventory.txt textfile to write on the homepage
-    def generateTopSeller3Page(self, index):
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
-        elements =  lines[index].strip().split(", ") ##refers to specific line of the textfile with the product information, elements in the row placed in list called elements
+class topSeller:
+    def __init__(self, ID):
+        self.ID = ID
+        
+    def getID(self):
+        return(self.ID)
+   
+        
+   
+class topOS:
+    def __init__(self, name, image):
+        self.name = name
+        self.image = image
+    
+    def getName(self):
+        return(self.name)
+    def getImage(self):
+        return self.image
+    
+    def setName(self, name):
+        self.name = name
+    def setImage(self, image):
+        self.image = image
+        
 
-        itemName = elements[0] #refers to product name
-        self.ui.topsellername3.setText(itemName)
-        self.ui.topsellername3.setStyleSheet("font-size: 25pt;")
 
-        itemPrice = elements[2] #refers to product price
-        self.ui.topSellerPrice3.setText(itemPrice)
-        self.ui.topSellerPrice3.setStyleSheet("font-size: 25pt;")
-
-        itemImage= elements[4] #refers to product image
-        self.ui.topSellerImage3.setIcon(QtGui.QIcon(itemImage))
-        myfile.close()
 
 
 if __name__ == '__main__':
@@ -450,4 +483,5 @@ if __name__ == '__main__':
     main_win.show()
 
     sys.exit(app.exec_())
+    
     
