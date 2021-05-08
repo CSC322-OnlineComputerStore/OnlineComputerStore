@@ -1,0 +1,4 @@
+productID, name, sellingPrice, OS, quantity, sold, profit, boughtPrice
+1, none, 0, none, 0, 0, 0, 0
+2, none, 0, none, 0, 0, 0, 0
+3, none, 0, none, 0, 0, 0, 0
