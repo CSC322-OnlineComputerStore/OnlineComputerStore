@@ -3,6 +3,9 @@
 # Chelsea Lantigua
 
 import sys
+import os
+import datetime
+
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QMessageBox, QPushButton
@@ -11,8 +14,10 @@ from PyQt5.QtWidgets import QMessageBox, QPushButton
 from PyQt5 import QtCore, QtGui, QtWidgets
 from customerHome import Ui_Homepage
 
+        
 class registered:
     def __init__(self):
+        self.filepath = os.getcwd()
         self.main_win = QMainWindow()
         self.ui = Ui_Homepage()
         self.ui.setupUi(self.main_win)
@@ -29,9 +34,7 @@ class registered:
         self.ui.profilebutton.clicked.connect(self.show_profile_page)
         self.ui.helpButton.clicked.connect(self.show_help_page)
         self.ui.cartbutton.clicked.connect(self.show_cart_page)
-        
-#----users can go onto the item page and buy the item
-        self.ui.productBuyButton.clicked.connect(self.buy_item)
+
         
 #-------------profilepage relationships using stackedWidget2 -------------
 
@@ -45,23 +48,56 @@ class registered:
  #-----profilepage relationships customer can use complain buttons on orders page to connect to make complain page about clerk
 
         self.ui.profilePageStoreClerk1ComplainButton.clicked.connect(self.make_complaints_page)
-        self.ui.profilePageStoreClerk2ComplainButton.clicked.connect(self.make_complaints_page)
        
  #-----profilepage relationships customer can use complain buttons on orders page to connect to make complain page about delivery companies
  
         self.ui.profilePageDeliveryCompany1ComplainButton.clicked.connect(self.make_complaints_page)
-        self.ui.profilePageDeliveryCompany2ComplainButton.clicked.connect(self.make_complaints_page)
+#        self.ui.profilePageDeliveryCompany2ComplainButton.clicked.connect(self.make_complaints_page)
         
 #----users can respond to complaints they have made
         self.ui.userComplaintLeaveMessageButton.clicked.connect(self.respond_complaints_page)
 
 #----users can respond to complaints made against them
         self.ui.theComplaintLeaveMessageButton.clicked.connect(self.respond_complaints_page)
+        self.userID = "12345"
+        self.folderPath = self.filepath + '/folders/all_users/all_customers/' + self.userID + "/" # the path to the users folder wil contain an order folder,  conversations folder, cart texfile, and complaints folder.
+        self.cartTextfile = self.folderPath + 'cart.txt' # the path for the user's cart
+        self.messagesNumber = 0 # sets the number of conversations between a user and store clerk
+        self.ordersNumber = 0 #sets the number of orders a user has
+      
+        #--users will have to finalize order when they press buy, after they finalize they will be taken to the profile page
+        self.ui.submitFinalizeOrderbutton.clicked.connect(self.show_profile_page)
+    
+        self.ui.chatHistoryButton.clicked.connect(self.showMessagesPage)
+        
+        self.ui.conversationWidgetTable.selectionModel().selectionChanged.connect(self.set_selectedConversation)
 
-#--users will have to finalize order when they press buy, this button will lead them to their order page
-        self.ui.submitFinalizeOrderbutton.clicked.connect(lambda x: self.showPopUpMessage("Finalize Order", "Thank you for your order, it is being Processed!"))
+        self.ui.chatSendButton.clicked.connect(self.createNewConversation)
+        
+        #--users will have to finalize order when they press buy, this button will lead them to update their orders page
+        self.ui.submitFinalizeOrderbutton.clicked.connect(lambda x: self.clearCart(self.file))
+        
+        self.ui.ordersTableWidget.selectionModel().selectionChanged.connect(self.set_selectedOrder)
+       
+        # cart table dimensions
+        self.ui.cartTableWidget.setColumnWidth(0, 280)
+        self.ui.cartTableWidget.setColumnWidth(1, 280)
+        self.ui.cartTableWidget.setColumnWidth(2, 280)
+        self.ui.cartTableWidget.setColumnWidth(3, 280)
+        
+        #message table dimensions
+        self.ui.messageTableWidget.setColumnWidth(0, 70)
+        self.ui.messageTableWidget.setColumnWidth(1, 280)
+        self.ui.messageTableWidget.setColumnWidth(2, 70)
+        self.ui.messageTableWidget.setColumnWidth(3, 280)
+        self.ui.messageTableWidget.setColumnWidth(4, 70)
 
-        self.ui.productBuyButton.clicked.connect(self.show_finalize_order_page)
+        #message list dimension
+        self.ui.conversationWidgetTable.setColumnWidth(0,200)
+        self.ui.conversationWidgetTable.horizontalHeader().setStretchLastSection(True)
+
+        #to send a message
+        self.ui.sendButton.clicked.connect(self.newmessage_set)
 
     def show(self):
         self.main_win.show()
@@ -71,9 +107,230 @@ class registered:
             
     def show_profile_page(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.profilepage)
+   
 
+
+#------------------------code for the chat box to chat with a store clerk -----------------
+# leads a user to the chat box to write the message box
     def show_help_page(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.chatpage)
+  
+  #will create a new conversation with a different textfile
+    def createNewConversation(self):
+        usersPathName = self.folderPath + "/conversations/"
+        if(os.path.exists(usersPathName) == 0): #if the file does not exists then
+            dir = "conversations/"
+            parent = self.folderPath
+            path = os.path.join(parent, dir)
+            os.mkdir(path)
+        self.userPathName = usersPathName + str(self.messagesNumber) + ".txt"
+      
+        text = str(self.ui.chatbox.toPlainText())
+        print(text)
+        
+        if len(text) == 0:
+            self.showPopUpMessage("Error", "Error, no message has been entered")
+        else:
+            myfile = open(self.userPathName, "w+")
+            myfile.write("customer\n" + text + "\n")
+            myfile.close()
+      
+            self.showPopUpMessage("Your message has been sent to a store clerk", "Your message has been sent to a store clerk, conversation #" + str(self.messagesNumber))
+            
+            self.messagesNumber += 1 #increment the number of messages every time a customer selects the help button. A new conversation will be made
+
+            #wont automatically go to messages page will have to go to profile page
+            self.ui.chatbox.clear()
+        
+            self.message_set()
+            self.ui.chatbox.clear()
+            self.ui.stackedWidget.setCurrentWidget(self.ui.profilepage)
+        return list
+
+    def showMessagesPage(self):
+        self.ui.stackedWidget2.setCurrentWidget(self.ui.messagesPage) #will direct user to the page which will be updated with the messages
+
+    #when the message page button is pressed display all messages from a specific conversation
+    def message_set(self):
+        if self.messagesNumber > 0: # if there is at least one conversation already taking place then read the file and set the message and conversation tables
+            self.get_messages(self.userPathName) # sets the message on the table
+            self.set_messagelist(self.userPathName) # sets the conversation number on the left table
+            
+    def newmessage_set(self):
+        self.set_message(self.userPathName) #will rewrite the message file with the users new message
+  
+    
+            
+    #will select a row on the conversations list to view all messages
+    def set_selectedConversation(self,selected):
+        row=0
+        column=0
+        for ix in selected.indexes():
+            row = ix.row()
+            column = 0
+      
+        self.selectedConversation= self.ui.conversationWidgetTable.item(row,column).text()
+        self.userPathName = self.folderPath + "/conversations/" +self.selectedConversation + ".txt"
+        self.get_messages(self.userPathName)
+        
+
+    #will set the messages table by reading the textfile
+    def get_messages(self,filename):
+        l=[]
+        k=[]
+        with open(filename, "r") as myfile:
+            lines=myfile.readlines()
+        l=lines
+        for i in range(len(l)):
+            l[i]=l[i].replace('\n','')
+        self.ui.messageTableWidget.setRowCount(int(len(l)/2))
+        self.ui.messageTableWidget.setColumnCount(5)
+        for i in range(len(l)-1):
+            if (l[i]=='clerk'):
+                item1 = QtWidgets.QTableWidgetItem('Clerk #00000')
+                item1.setTextAlignment(QtCore.Qt.AlignCenter)
+                item2 = QtWidgets.QTableWidgetItem(l[i+1])
+                item2.setTextAlignment(QtCore.Qt.AlignLeft)
+                item2.setTextAlignment(QtCore.Qt.AlignVCenter)
+                self.ui.messageTableWidget.setItem(i/2,0,item1)
+                self.ui.messageTableWidget.item(i/2, 0).setForeground(QtGui.QColor(177,177,177))
+                self.ui.messageTableWidget.setItem(i/2,1,item2)
+                self.ui.messageTableWidget.item(i/2, 1).setBackground(QtGui.QColor(233,211,202))
+                self.ui.messageTableWidget.item(i/2, 1).setForeground(QtGui.QColor(177,177,177))
+
+            elif (l[i]=='customer'):
+                item1 = QtWidgets.QTableWidgetItem('You')
+                item1.setTextAlignment(QtCore.Qt.AlignCenter)
+                item2 = QtWidgets.QTableWidgetItem(l[i+1])
+                item2.setTextAlignment(QtCore.Qt.AlignVCenter|QtCore.Qt.AlignRight)
+                self.ui.messageTableWidget.setItem(int(i/2),int(3),item2)
+                self.ui.messageTableWidget.item(int(i/2), int(3)).setBackground(QtGui.QColor(int(255),int(255),int(255)))
+                self.ui.messageTableWidget.item(int(i/2), int(3)).setForeground(QtGui.QColor(177,177,177))
+                self.ui.messageTableWidget.setItem(int(i/2),int(4),item1)
+                self.ui.messageTableWidget.item(int(i/2), int(4)).setForeground(QtGui.QColor(177,177,177))
+
+    def set_message(self,filename):
+        l=[]
+        k=[]
+        with open(filename, "r") as myfile:
+            lines=myfile.readlines()
+            l=lines
+        message = self.ui.messagesInputBox.toPlainText()
+        for i in range(len(l)):
+            if (i==(len(l)-1)):
+                l[i]+='\n'
+        l.append('customer\n')
+        l.append(message)
+        with open(filename,"w") as file:
+            file.writelines(l)
+            file.close()
+        self.ui.messagesInputBox.clear()
+        self.get_messages(filename)
+        
+        return filename
+
+
+    def set_messagelist(self,filename):
+        rowNum = self.ui.conversationWidgetTable.rowCount()
+        print(rowNum)
+        self.ui.conversationWidgetTable.insertRow(rowNum)
+        item1 = QtWidgets.QTableWidgetItem(str(self.messagesNumber -1))
+#            item2 = QtWidgets.QTableWidgetItem(l[i][1])
+        self.ui.conversationWidgetTable.setItem(rowNum,0,item1)
+#            self.ui.message_list.setItem(i,1,item2)
+
+
+
+    def return_customer_info(self,filename):
+        l=[]
+        with open(filename, "r") as myfile:
+            lines=myfile.readlines()
+            l=lines
+        return l
+        
+#------------------------code to write the users orders and display them in a table--------------------
+     
+  
+    def newOrder(self):
+        orderPath = self.folderPath+ "/orders/"
+        clerkspathName = self.filepath+'/folders/all_users/all_clerks/00000/chat' + self.userID + '/'
+        
+        if(os.path.exists(orderPath) == 0): #if the file does not exists then
+            dir = "orders/"
+            parent = self.folderPath
+            path = os.path.join(parent, dir)
+            os.mkdir(path)
+        
+        print("usersPath = " + str(orderPath))
+        self.orderPath = str(orderPath) + str(self.ordersNumber) + ".txt"
+        
+        myfile = open(self.orderPath, "w+")
+        myfile.write(str(self.ordersNumber) + "\n" + str(self.userID)+ "\n" + str(datetime.datetime.now()) + "\n" + "Pending\nto be set\nShipping Address\nStore Clerks that handled the order\nDelivery Companies that are delivering the items\n")
+        myfile.close()
+
+        return self.orderPath
+    #will read the order information from the textfile
+    def readOrderInfo(self, file):
+        with open(file, "r") as myfile:
+            lines=myfile.readlines()
+            l=lines
+        for i in range(len(l)):
+            l[i]=l[i].replace('\n','')
+            
+        self.ui.ordersTableWidget.setColumnCount(7) # table have 7 columns
+        self.ui.ordersTableWidget.setRowCount(self.ordersNumber) # table has rows dependent on number of orders
+        rowNum = self.ui.ordersTableWidget.rowCount()
+        self.ui.conversationWidgetTable.insertRow(rowNum) # adds a row
+    
+        item1 = QtWidgets.QTableWidgetItem(str(l[0]))  #order number
+        item1.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.ui.ordersTableWidget.setItem(self.ordersNumber-1,0,item1)
+        
+        item1 = QtWidgets.QTableWidgetItem(str(l[3]))  #status
+        item1.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.ui.ordersTableWidget.setItem(self.ordersNumber-1,2,item1)
+        
+        item1 = QtWidgets.QTableWidgetItem(str(l[4]))  #tracking number
+        item1.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.ui.ordersTableWidget.setItem(self.ordersNumber-1,3,item1)
+        
+        item1 = QtWidgets.QTableWidgetItem(str(l[2]))  #date
+        item1.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.ui.ordersTableWidget.setItem(self.ordersNumber-1,4,item1)
+        
+        item1 = QtWidgets.QTableWidgetItem(str(l[6]))  #clerk
+        item1.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.ui.ordersTableWidget.setItem(self.ordersNumber-1,5,item1)
+        
+        item1 = QtWidgets.QTableWidgetItem(str(l[7]))  #delivery company
+        item1.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.ui.ordersTableWidget.setItem(self.ordersNumber-1,6,item1)
+        
+        totalPrice = 0
+        
+        for item in l[8:]: # will travers items in l array  at and after index 8 because these will be the products. The product are in the format of lines seperated by commas for their attributes name ID Quantity and price
+            newlist = item.split(", ")
+            totalPrice += int(newlist[3]) # all the different prices will be added to compute total
+            
+        item1 = QtWidgets.QTableWidgetItem(str(totalPrice))  #total price
+        item1.setTextAlignment(QtCore.Qt.AlignLeft)
+        self.ui.ordersTableWidget.setItem(self.ordersNumber-1,1,item1)
+       
+       
+    
+    #will select a row on the conversations list to view all messages
+    def set_selectedOrder(self,selected):
+        row=0
+        column=0
+        for ix in selected.indexes():
+            row = ix.row()
+            column = 0
+      
+        self.selectedOrder= self.ui.ordersTableWidget.item(row,column).text()
+        self.orderPath = self.folderPath + "/orders/" + self.selectedOrder + ".txt"
+        self.get_messages(self.orderPath)
+        
+       
 
     def show_cart_page(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.cartpage)
@@ -90,8 +347,12 @@ class registered:
     def show_item_page(self, product):
         self.generateItem(product)
         self.ui.stackedWidget.setCurrentWidget(self.ui.itempage)
-        
+    
+    
+    
+  #  _________________________cart funtions_______________________________
     # will take the info from the 3 OS pages, search for it and then add it to the cart
+
     def generateItemInfo4(self, nameUI, priceUI):
         name = nameUI.text()
         price = priceUI.text()
@@ -139,6 +400,7 @@ class registered:
             if (item.getName() == name and item.getPrice() == price): #checks if the product object in the inventory list
                 ID = item.getID()
                 break
+        
         return item
     
     #for item page
@@ -154,18 +416,18 @@ class registered:
 
     #will add the item to the cart
     def add_to_cart(self, product):
-        file = self.writeToCartTextfile(product, "12345") #cart file will be created and also updated
+        file = self.writeToCartTextfile(product) #cart file will be created and also updated
         self.showCartTable(file) #cart file will be created
         self.ui.stackedWidget.setCurrentWidget(self.ui.cartpage) # The cart is shown once it is updated
-        comboBox1 = self.ui.cartItem1comboBox # will look at combobox 1
-        comboBox2 = self.ui.cartItem2comboBox # will look at combobox 2
-        self.ui.cartMakeChangesButton.clicked.connect(lambda x: self.readComboBox(comboBox1))
+#        comboBox1 = self.ui.cartItem1comboBox # will look at combobox 1
+#        comboBox2 = self.ui.cartItem2comboBox # will look at combobox 2
+#        self.ui.cartMakeChangesButton.clicked.connect(lambda x: self.readComboBox(comboBox1))
 
     #will read and write to the cart textfile
-    def writeToCartTextfile(self, product, userID):
-        file = userID + "cart.txt"
+    def writeToCartTextfile(self, product):
+        file = self.cartTextfile
         itemsArray = self.readInventoryTextFile()
-
+ 
         #opens the cart file to read
         myfile = open(file, "r+")
         lines = myfile.readlines()
@@ -194,10 +456,7 @@ class registered:
         myfile.write(", ")
         myfile.write(str(1)) #quantity will equal 1
         myfile.write(", ")
-        myfile.write(product.getPrice())
-        myfile.write(", ")
         num = int(product.getPrice().replace("$", ""))
-        
         total = num * (1) #stores the total
         myfile.write(str(total))
         myfile.write("\n")
@@ -205,6 +464,39 @@ class registered:
         myfile.close()
         return file
         
+         # will check if cart is empty or not, if so will get error else order will be placed
+    def checkCart(self, file):
+        with open(file, "r") as f:
+            length = len(f.readlines())
+        if length == 0: #checks if there are no items in the cart
+            self.showPopUpMessage("No items in cart", "Your cart is emtpy can not make a purchase")
+        else: # if there are items in the cart and therefore the order than the order can be finalized
+            self.file = file
+            self.showPopUpMessage("Finalize Order", "Please finalize your order")
+            self.ui.stackedWidget.setCurrentWidget(self.ui.finalizeOrderpage)
+            
+    #will read the cart and also write the new order on the order table
+    def clearCart(self, file):
+        orderFile = self.newOrder()
+        with open(file ,'r') as cartfile, open(orderFile ,'a') as orderfile:
+            # read content from first file
+            for line in cartfile:
+                orderfile.write(line)
+        
+        file = open(file,"r+")
+        file.truncate(0)
+        file.close()
+        
+        self.ui.cartTableWidget.setRowCount(0)
+        self.ui.cartTotalCostAmount.setText("$0")
+        
+        self.ordersNumber += 1 #increment the number of messages every time a customer selects the help button. A new conversation will be made
+        self.readOrderInfo(orderFile) # writes the order to the table
+    
+    def show_finalize_order_page(self, file):
+        self.checkCart(file)
+    
+    #___________________end of cart functions __________________
     def showPopUpMessage(self, title, message):
         output = QMessageBox()
         output.setWindowTitle(title)
@@ -213,12 +505,6 @@ class registered:
     
     def buy_item(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.cartpage)
-
-    def show_finalize_order_page(self, file):
-        self.ui.stackedWidget.setCurrentWidget(self.ui.finalizeOrderpage)
-        file = open(file,"r+")
-        file.truncate(0)
-        file.close()
 
     def show_profile_orders_page(self):
         self.ui.stackedWidget2.setCurrentWidget(self.ui.orderspage)
@@ -309,6 +595,36 @@ class registered:
         osImageButtons[i].clicked.connect(showOSpageFunctions[i]) #connects the operating system image to it's page
         seeProductsButtons[i].clicked.connect(showOSpageFunctions[i]) #connects the operating system see products button to it's page
         
+        
+        seeProductsButtons[i].setStyleSheet("QPushButton{\n"
+        "    border-radius:15px;\n"
+        "    border-top:2px solid #4a89c7;\n"
+        "    border-bottom:2px solid #4a89c7;\n"
+        "    border-right:2px solid #4a89c7;\n"
+        "    border-left:2px solid #4a89c7;\n"
+        "    background-color:#4A7FC7;\n"
+        "    color:#ffffff;\n"
+        "    padding: 5px;\n"
+        "}\n"
+        "QPushButton:hover{\n"
+        "    color:#ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    border-top:2px solid #84afd9;\n"
+        "    border-bottom:2px solid #84afd9;\n"
+        "    border-right:2px solid #84afd9;\n"
+        "    border-left:2px solid#84afd9;\n"
+        "}\n"
+        "QPushButton:pressed{\n"
+        "    color:ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    color:#ffffff;\n"
+        "    border:none;\n"
+        "    border-top:3px solid rgb(178, 84, 84);\n"
+        "    border-right:1px solid rgb(178, 84, 84);\n"
+        "    border-left:2px solid rgb(178, 84, 84);\n"
+        "}")
+
+        
         items = [] #store the items that match to the OS system we are looking at
         position = [] #store the position of the items that match to the OS system we are looking at
 
@@ -341,7 +657,6 @@ class registered:
         os1ItemNames = [self.ui.OS1name1, self.ui.OS1name2, self.ui.OS1name3, self.ui.OS1name4, self.ui.OS1name5, self.ui.OS1name6] #ui objects for top OS products names
         os1ItemPrice = [self.ui.OS1price1, self.ui.OS1price2, self.ui.OS1price3, self.ui.OS1price4, self.ui.OS1price5, self.ui.OS1price6] #ui objects for top OS products prices
         addCartButtons = [self.ui.OS1cartbutton1, self.ui.OS1cartbutton2, self.ui.OS1cartbutton3, self.ui.OS1cartbutton4, self.ui.OS1cartbutton5, self.ui.OS1cartbutton6] # add to cart buttons
-        self.matchOS(os1ItemNames, os1ItemPrice, os1PageImageButton, matchedItems, matchedPosition, addCartButtons)
 
         #if any of the add to cart buttons on OS page are pressed then the item is displayed is then added to the cart
         self.ui.OS1cartbutton1.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name1, self.ui.OS1price1))
@@ -350,6 +665,16 @@ class registered:
         self.ui.OS1cartbutton4.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name4, self.ui.OS1price4))
         self.ui.OS1cartbutton5.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name5, self.ui.OS1price5))
         self.ui.OS1cartbutton6.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name6, self.ui.OS1price6))
+        
+        #will match the OS items images to their information
+        self.matchOS( self.ui.OS1name1, self.ui.OS1price1, self.ui.OS1Image1, matchedItems[0], matchedPosition[0], self.ui.OS1cartbutton1)
+        self.matchOS(self.ui.OS1name2, self.ui.OS1price2, self.ui.OS1Image2, matchedItems[1], matchedPosition[1], self.ui.OS1cartbutton2)
+        self.matchOS(self.ui.OS1name3, self.ui.OS1price3, self.ui.OS1Image3, matchedItems[2], matchedPosition[2], self.ui.OS1cartbutton3)
+        self.matchOS(self.ui.OS1name4, self.ui.OS1price4, self.ui.OS1Image4, matchedItems[3], matchedPosition[3], self.ui.OS1cartbutton4)
+        self.matchOS(self.ui.OS1name5, self.ui.OS1price5, self.ui.OS1Image5, matchedItems[4], matchedPosition[4], self.ui.OS1cartbutton5)
+        self.matchOS(self.ui.OS1name6, self.ui.OS1price6, self.ui.OS1Image6, matchedItems[5], matchedPosition[5], self.ui.OS1cartbutton6)
+        
+        
     
     #generates top OS 2 page
     def generateTopOS2Page(self, matchedItems, matchedPosition):
@@ -359,7 +684,6 @@ class registered:
         os2ItemNames = [self.ui.OS2name1, self.ui.OS2name2, self.ui.OS2name3, self.ui.OS2name4, self.ui.OS2name5, self.ui.OS2name6] #ui objects for top OS products names
         os2ItemPrice = [self.ui.OS2price1, self.ui.OS2price2, self.ui.OS2price3, self.ui.OS2price4, self.ui.OS2price5, self.ui.OS2price6] #ui objects for top OS products prices
         addCartButtons = [self.ui.OS2cartbutton1, self.ui.OS2cartbutton2, self.ui.OS2cartbutton3, self.ui.OS2cartbutton4, self.ui.OS2cartbutton5, self.ui.OS2cartbutton6]
-        self.matchOS(os2ItemNames, os2ItemPrice, os2PageImageButton, matchedItems, matchedPosition, addCartButtons)
     
         #if any of the add to cart buttons on OS page are pressed then the item is displayed is then added to the cart
         self.ui.OS2cartbutton1.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name1, self.ui.OS2price1))
@@ -369,6 +693,15 @@ class registered:
         self.ui.OS2cartbutton5.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name5, self.ui.OS2price5))
         self.ui.OS2cartbutton6.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name6, self.ui.OS2price6))
         
+        
+        #will match the OS items images to their information
+        self.matchOS( self.ui.OS2name1, self.ui.OS2price1, self.ui.OS2Image1, matchedItems[0], matchedPosition[0], self.ui.OS2cartbutton1)
+        self.matchOS(self.ui.OS2name2, self.ui.OS2price2, self.ui.OS2Image2, matchedItems[1], matchedPosition[1], self.ui.OS2cartbutton2)
+        self.matchOS(self.ui.OS2name3, self.ui.OS2price3, self.ui.OS2Image3, matchedItems[2], matchedPosition[2], self.ui.OS2cartbutton3)
+        self.matchOS(self.ui.OS2name4, self.ui.OS2price4, self.ui.OS2Image4, matchedItems[3], matchedPosition[3], self.ui.OS2cartbutton4)
+        self.matchOS(self.ui.OS2name5, self.ui.OS2price5, self.ui.OS2Image5, matchedItems[4], matchedPosition[4], self.ui.OS2cartbutton5)
+        self.matchOS(self.ui.OS2name6, self.ui.OS2price6, self.ui.OS2Image6, matchedItems[5], matchedPosition[5], self.ui.OS2cartbutton6)
+        
     #generates top OS 3 page
     def generateTopOS3Page(self, matchedItems, matchedPosition):
         #top OS page ui components
@@ -376,7 +709,6 @@ class registered:
         os3ItemNames = [self.ui.OS3name1, self.ui.OS3name2, self.ui.OS3name3, self.ui.OS3name4, self.ui.OS3name5, self.ui.OS3name6]  #ui objects for top OS products names
         os3ItemPrice = [self.ui.OS3price1, self.ui.OS3price2, self.ui.OS3price3, self.ui.OS3price4, self.ui.OS3price5, self.ui.OS3price6]  #ui objects for top OS products prices
         addCartButtons = [self.ui.OS3cartbutton1, self.ui.OS3cartbutton2, self.ui.OS3cartbutton3, self.ui.OS3cartbutton4, self.ui.OS3cartbutton5, self.ui.OS3cartbutton6]
-        self.matchOS(os3ItemNames, os3ItemPrice, os3PageImageButton, matchedItems, matchedPosition, addCartButtons)
         
         #if any of the add to cart buttons on OS page are pressed then the item is displayed is then added to the cart
         self.ui.OS3cartbutton1.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name1, self.ui.OS3price1))
@@ -386,34 +718,66 @@ class registered:
         self.ui.OS3cartbutton5.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name5, self.ui.OS3price5))
         self.ui.OS3cartbutton6.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name6, self.ui.OS3price6))
 
-    #will structure the different products based on their OS. Matches the product attributes to the ui components
-    def matchOS(self, uiNameArray, uiPriceArray, uiImageArray, matchedItems, matchedPosition, addCartButtons):
+        #will match the OS items images to their information
+        self.matchOS(self.ui.OS3name1, self.ui.OS3price1, self.ui.OS3Image1, matchedItems[0], matchedPosition[0], self.ui.OS3cartbutton1)
+        self.matchOS(self.ui.OS3name2, self.ui.OS3price2, self.ui.OS3Image2, matchedItems[1], matchedPosition[1], self.ui.OS3cartbutton2)
+        self.matchOS(self.ui.OS3name3, self.ui.OS3price3, self.ui.OS3Image3, matchedItems[2], matchedPosition[2], self.ui.OS3cartbutton3)
+        self.matchOS(self.ui.OS3name4, self.ui.OS3price4, self.ui.OS3Image4, matchedItems[3], matchedPosition[3], self.ui.OS3cartbutton4)
+        self.matchOS(self.ui.OS3name5, self.ui.OS3price5, self.ui.OS3Image5, matchedItems[4], matchedPosition[4], self.ui.OS3cartbutton5)
+        self.matchOS(self.ui.OS3name6, self.ui.OS3price6, self.ui.OS3Image6, matchedItems[5], matchedPosition[5], self.ui.OS3cartbutton6)
+  
+    def matchOS(self, uiName, uiPrice, uiImage, matchedItem, matchedPosition, addCartButton):
            
         itemsArray = self.readInventoryTextFile()
-        count = 0 # to repeat the for loop
-        #will traverse throught the lines in the array and store the matched items to the associated Operating system
-        while count <= len(matchedItems) -1:
-            index = matchedPosition[count]
-            itemObject = itemsArray[index]
+       
+        index = matchedPosition
+        itemObject = itemsArray[index]
 
-            itemName = itemObject.getName() #refers to the name
-            uiNameArray[count].setText(itemName)
-            uiNameArray[count].setStyleSheet("font-size: 25pt;")
+        itemName = itemObject.getName() #refers to the name
+        uiName.setText(itemName)
+        uiName.setStyleSheet("font-size: 25pt;")
 
-            itemPrice = itemObject.getPrice() #refers to the price
-            uiPriceArray[count].setText(itemPrice) #refers to the price
-            uiPriceArray[count].setStyleSheet("font-size: 25pt;")
+        itemPrice = itemObject.getPrice() #refers to the price
+        uiPrice.setText(itemPrice) #refers to the price
+        uiPrice.setStyleSheet("font-size: 25pt;")
 
-            itemImage= itemObject.getImage() #refers to the image
-            uiImageArray[count].setIcon(QtGui.QIcon(itemImage))
-            uiImageArray[count].setIconSize(QtCore.QSize(300, 200))
-            
-            uiImageArray[count].clicked.connect(lambda x: self.show_item_page(itemObject))
-            
-            addCartButtons[count].setText("ADD TO CART")
-            addCartButtons[count].setStyleSheet("font-size: 13pt;")
-                    
-            count = count + 1
+        itemImage= itemObject.getImage() #refers to the image
+        uiImage.setIcon(QtGui.QIcon(itemImage))
+        uiImage.setIconSize(QtCore.QSize(300, 200))
+        
+        uiImage.clicked.connect(lambda x: self.show_item_page(itemObject))
+        
+        addCartButton.setText("ADD TO CART")
+        addCartButton.setStyleSheet("font-size: 13pt;")
+
+        
+        addCartButton.setStyleSheet("QPushButton{\n"
+    "    border-radius:15px;\n"
+    "    border-top:2px solid #4a89c7;\n"
+    "    border-bottom:2px solid #4a89c7;\n"
+    "    border-right:2px solid #4a89c7;\n"
+    "    border-left:2px solid #4a89c7;\n"
+    "    background-color:#4A7FC7;\n"
+    "    color:#ffffff;\n"
+    "    padding: 5px;\n"
+    "}\n"
+    "QPushButton:hover{\n"
+    "    color:#ffffff;\n"
+    "    background-color:#84afd9;\n"
+    "    border-top:2px solid #84afd9;\n"
+    "    border-bottom:2px solid #84afd9;\n"
+    "    border-right:2px solid #84afd9;\n"
+    "    border-left:2px solid#84afd9;\n"
+    "}\n"
+    "QPushButton:pressed{\n"
+    "    color:ffffff;\n"
+    "    background-color:#84afd9;\n"
+    "    color:#ffffff;\n"
+    "    border:none;\n"
+    "    border-top:3px solid rgb(178, 84, 84);\n"
+    "    border-right:1px solid rgb(178, 84, 84);\n"
+    "    border-left:2px solid rgb(178, 84, 84);\n"
+    "}")
 
     #will generate the top sellers on the homepage by looking into the topSeller.txt, creates objects of the items
     def readTopSellers(self):
@@ -462,6 +826,34 @@ class registered:
         self.matchTopSeller(item, self.ui.topsellername1,  self.ui.topSellerPrice1, self.ui.topSellerImage1)
         ##-----homepage top seller button leads to cart page through the generateItemInfo1 function
         self.ui.topsellerbutton1.clicked.connect(lambda x: self.generateItemInfo1())
+        self.ui.topsellerbutton1.setStyleSheet("QPushButton{\n"
+        "    border-radius:15px;\n"
+        "    border-top:2px solid #4a89c7;\n"
+        "    border-bottom:2px solid #4a89c7;\n"
+        "    border-right:2px solid #4a89c7;\n"
+        "    border-left:2px solid #4a89c7;\n"
+        "    background-color:#4A7FC7;\n"
+        "    color:#ffffff;\n"
+        "    padding: 5px;\n"
+        "}\n"
+        "QPushButton:hover{\n"
+        "    color:#ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    border-top:2px solid #84afd9;\n"
+        "    border-bottom:2px solid #84afd9;\n"
+        "    border-right:2px solid #84afd9;\n"
+        "    border-left:2px solid#84afd9;\n"
+        "}\n"
+        "QPushButton:pressed{\n"
+        "    color:ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    color:#ffffff;\n"
+        "    border:none;\n"
+        "    border-top:3px solid rgb(178, 84, 84);\n"
+        "    border-right:1px solid rgb(178, 84, 84);\n"
+        "    border-left:2px solid rgb(178, 84, 84);\n"
+        "}")
+                
 
 
     #will record the second top seller product information to write on the homepage
@@ -469,6 +861,34 @@ class registered:
         self.matchTopSeller(item, self.ui.topsellername2, self.ui.topSellerPrice2, self.ui.topSellerImage2)
         ##-----homepage top seller button leads to cart page through the generateItemInfo2 function
         self.ui.topsellerbutton2.clicked.connect(lambda x: self.generateItemInfo2())
+        self.ui.topsellerbutton2.setStyleSheet("QPushButton{\n"
+        "    border-radius:15px;\n"
+        "    border-top:2px solid #4a89c7;\n"
+        "    border-bottom:2px solid #4a89c7;\n"
+        "    border-right:2px solid #4a89c7;\n"
+        "    border-left:2px solid #4a89c7;\n"
+        "    background-color:#4A7FC7;\n"
+        "    color:#ffffff;\n"
+        "    padding: 5px;\n"
+        "}\n"
+        "QPushButton:hover{\n"
+        "    color:#ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    border-top:2px solid #84afd9;\n"
+        "    border-bottom:2px solid #84afd9;\n"
+        "    border-right:2px solid #84afd9;\n"
+        "    border-left:2px solid#84afd9;\n"
+        "}\n"
+        "QPushButton:pressed{\n"
+        "    color:ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    color:#ffffff;\n"
+        "    border:none;\n"
+        "    border-top:3px solid rgb(178, 84, 84);\n"
+        "    border-right:1px solid rgb(178, 84, 84);\n"
+        "    border-left:2px solid rgb(178, 84, 84);\n"
+        "}")
+                
 
 
     #will record the third top seller product information to write on the homepage
@@ -476,6 +896,34 @@ class registered:
         self.matchTopSeller(item, self.ui.topsellername3, self.ui.topSellerPrice3, self.ui.topSellerImage3)
         ##-----homepage top seller button leads to cart page through the generateItemInfo3 function
         self.ui.topsellerbutton3.clicked.connect(lambda x: self.generateItemInfo3())
+        self.ui.topsellerbutton3.setStyleSheet("QPushButton{\n"
+        "    border-radius:15px;\n"
+        "    border-top:2px solid #4a89c7;\n"
+        "    border-bottom:2px solid #4a89c7;\n"
+        "    border-right:2px solid #4a89c7;\n"
+        "    border-left:2px solid #4a89c7;\n"
+        "    background-color:#4A7FC7;\n"
+        "    color:#ffffff;\n"
+        "    padding: 5px;\n"
+        "}\n"
+        "QPushButton:hover{\n"
+        "    color:#ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    border-top:2px solid #84afd9;\n"
+        "    border-bottom:2px solid #84afd9;\n"
+        "    border-right:2px solid #84afd9;\n"
+        "    border-left:2px solid#84afd9;\n"
+        "}\n"
+        "QPushButton:pressed{\n"
+        "    color:ffffff;\n"
+        "    background-color:#84afd9;\n"
+        "    color:#ffffff;\n"
+        "    border:none;\n"
+        "    border-top:3px solid rgb(178, 84, 84);\n"
+        "    border-right:1px solid rgb(178, 84, 84);\n"
+        "    border-left:2px solid rgb(178, 84, 84);\n"
+        "}")
+                
 
         
     def matchTopSeller(self, item, uiName, uiPrice, uiImage):
@@ -498,18 +946,60 @@ class registered:
         
 #will read the inventory textfile and create an array of product objects
     def readInventoryTextFile(self):
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
-        index = 0
-        itemArray = [] #to store the item objects
-        for singleLine in lines: #breaks the list down to lines
-            newline = singleLine.strip() #strips the "\n" from the strings line
-            item = newline.split(", ") #strips strings by the ", " deliminter 6 elements per line now added to new list
-#            del item[0]
-            itemArray.append(product(item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])) #array of item objects #adds the item objects to an array
-            index = index + 1
+        myfile = open(self.filepath+ '/Resources/Data/Products/products.txt', "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsData = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            product = newline.split(", ")
+            allProductsData.append(product)
+     
         myfile.close()
-        return itemArray
+
+        # ID, images
+        myfile = open(self.filepath+ '/Resources/Data/Products/products_images.txt', "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsImages = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            productImages = newline.split(", ")
+#            del productImages[0]
+            imageName = productImages[1]
+            allProductsImages.append(imageName)
+
+        myfile.close()
+    
+        # ID, description
+        myfile = open(self.filepath+ '/Resources/Data/Products/products_descriptions.txt', "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsDescriptions = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            productDescription = newline.split(", ", 1)
+            del productDescription[0]
+            allProductsDescriptions.append(productDescription)
+
+        i = 0
+        for product in allProductsData:
+            product.append(allProductsImages[i])
+            product.append(allProductsDescriptions[i][0])
+            i += 1
+
+        myfile.close()
+
+        path = self.filepath+ "/Resources/ProductsImages/"
+        allProducts = []
+        for pData in allProductsData:
+            #ID, name, price, OS, quantity, sold, profit, boughtPrice, images, description
+            allProducts.append(storeProduct(pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7],  pData[8], pData[9]))
+
+        return allProducts
 
 #will display the cart with the items that have been added to it
     def showCartTable(self, file):
@@ -521,13 +1011,14 @@ class registered:
                 newline = singleLine.strip() #strips the "\n" from the strings line
                 item = newline.split(", ") #strips strings by the ", " delimiter
                 print("ITEM: ", item)
-                total += int(item[4]) # will update the total cost of the items in a cart
+                total += int(item[3]) # will update the total cost of the items in a cart
                 l.append(item)
 
         self.ui.cartTotalCostAmount.setText(str(total)) # will update the total on the ui object
         self.ui.cartTableWidget.setSortingEnabled(False)
         self.ui.cartTableWidget.setRowCount(len(l))
         self.ui.cartTableWidget.setColumnCount(len(l[0]))
+
         
         for i in range(len(l)):
             for j in range(len(l[0])):
@@ -538,6 +1029,7 @@ class registered:
         
         #--users will have to finalize order when they press place order on their cart page or buy on an item page
         self.ui.placeorderbutton.clicked.connect(lambda x: self.show_finalize_order_page(file))
+#
 
     #will read the user input for the number of items
     def readComboBox(self, comboBoxName):
@@ -546,18 +1038,40 @@ class registered:
         print("content", content)
         return content
         
-class product:
-    def __init__(self, name, ID, price, description, image, OS, itemsSold, quantity):
+    
+    def rateItem(self):
+        name = self.ui.profilePageItem1.text()
+        itemsArray = self.readInventoryTextFile()
+        index = 0
+        for item in itemsArray: #breaks the list down to seperate product objects
+            if (item.getName() == name): #checks if the product object in the inventory list
+                ID = item.getID()
+                break
+        
+        rating = self.readComboBox(self.ui.profilePageItem1comboBox)
+        
+        sum = item.getTotalRatingSum() + rating
+        newRate = item.setTotalRatingSum(sum)
+        item.setRate(newRate)
+        #next will write into inventory textfile
+        return item
+   
+
+        
+class storeProduct:
+    def __init__(self, ID, name, price, OS, quantity, sold, profit, boughtPrice, image, description):
         self.name = name
         self.ID = ID
         self.price = price
         self.description = description
         self.image = image
         self.OS = OS
-        self.itemsSold = itemsSold
+        self.sold = sold
         self.quantity = quantity
         self.rate = 0
         self.totalRatingSum = 0
+        self.profit = profit
+
     
     def getName(self):
         return self.name
@@ -579,6 +1093,12 @@ class product:
         return self.rate
     def getTotalRatingSum(self):
         return self.totalRatingSum
+    def getProfit(self):
+        return self.profit
+
+        
+        
+        
         
     def setName(self, name):
         self.name = name
@@ -600,6 +1120,8 @@ class product:
         self.rate = totalRatingSum/itemsSold
     def setTotalRatingSum(self, totalRatingSum):
         self.totalRatingSum = totalRatingSum
+    def setProfit(self, profit):
+        self.profit = profit
       
 class topSeller:
     def __init__(self, ID):
