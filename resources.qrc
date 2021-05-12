@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/Images">
+        <file>bandeja-de-entrada.png</file>
+        <file>cajas.png</file>
+        <file>etiqueta.png</file>
+        <file>box.png</file>
+        <file>cajas.png</file>
+        <file>XPACE_LOGO.png</file>
+        <file>circle.png</file>
+    </qresource>
+</RCC>

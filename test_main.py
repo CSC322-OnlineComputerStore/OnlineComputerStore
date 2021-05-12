@@ -27,8 +27,8 @@ class test_main:
         self.ui.order_bet_table.selectionModel().selectionChanged.connect(self.set_selectedorder_info)
 
     def set(self):
-        self.set_bets(self.filepath+'/all_bets/'+self.selectedOrderno)
-        self.get_bets(self.filepath+'/all_bets/'+self.selectedOrderno)
+        self.set_bets(self.filepath+'all_orders'+'/all_bets/'+self.selectedOrderno)
+        self.get_bets(self.filepath+'all_orders'+'/all_bets/'+self.selectedOrderno)
 
     def show(self):
         self.main_win.show()
@@ -39,7 +39,7 @@ class test_main:
 
 
     def show_bet_page(self):
-        self.get_order(self.filepath+'/all_orders/1122350')
+        self.get_order(self.filepath+'/all_orders/'+'order_count')
         self.ui.stackedWidget.setCurrentWidget(self.ui.bet_page)
         self.ui.header_label.setText("View Bets")
 
@@ -82,9 +82,9 @@ class test_main:
         self.selectedOrderno = self.ui.order_bet_table.item(row,column).text()
         self.selectedProductno= self.ui.order_bet_table.item(row,2).text()
         self.selectedCustomerno= self.ui.order_bet_table.item(row,1).text()
-        self.get_bets(self.filepath+'/all_bets/'+self.selectedOrderno)
-        self.set_customer_info(self.filepath+'/all_customers/'+self.selectedCustomerno)
-        self.set_product_info(self.filepath+'/all_products/'+self.selectedProductno)
+        self.get_bets(self.filepath+'/all_orders/all_bets/'+self.selectedOrderno)
+        self.set_customer_info(self.filepath+'/all_users/'+'/all_customers/'+self.selectedCustomerno+'/info')
+        self.set_product_info(self.filepath+'/all_products/'+self.selectedProductno+'/info')
         self.set_order_info(self.filepath+'/all_orders/orders/'+self.selectedOrderno)
        
 
@@ -137,6 +137,7 @@ class test_main:
         for i in range(len(l)):
             for j in range(len(l[i])):
                 item = QtWidgets.QTableWidgetItem(l[i][j])
+                item.setTextAlignment(QtCore.Qt.AlignCenter)
                 self.ui.all_bets_table.setItem(i,j,item)
         self.ui.all_bets_table.setSortingEnabled(True)
         self.ui.all_bets_table.sortItems(0,QtCore.Qt.AscendingOrder)
@@ -163,6 +164,7 @@ class test_main:
         for i in range(len(n)):
             for j in range(len(n[i])):
                 item = QtWidgets.QTableWidgetItem(n[i][j])
+                item.setTextAlignment(QtCore.Qt.AlignCenter)
                 self.ui.order_bet_table.setItem(i,j,item)
 
 
