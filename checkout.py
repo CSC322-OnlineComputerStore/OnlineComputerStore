@@ -1,3 +1,4 @@
+import random
 import sys
 from decimal import Decimal
 from PyQt5.QtWidgets import QApplication
@@ -8,12 +9,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import CardChecking
 #from checkoutPages import Ui_HomepageV2
 from checkoutPages2 import Ui_HomepageV2
+from customerHome import Ui_Homepage
 from CardChecking import purchase
+from CardChecking import CreditCard
+from CardChecking import Response
 
 
 class PurchasePage:
     def __init__(self):
         self.main_window = QMainWindow()
+        #
+        self.ui2 = Ui_Homepage()
+
         self.ui = Ui_HomepageV2()
         self.ui.setupUi(self.main_window)
         self.ui.WrongInfo.setHidden(True)
@@ -36,12 +43,15 @@ class PurchasePage:
         self.expDate = None
 
         self.card = None
+        self.response_list = CardChecking.Response
+        # self.response_list = CardChecking.response_options()
 
         self.result = False
         self.total = Decimal("5.00")
 
     def confirm_pressed(self):
-        self.ui.pushButton.clicked.connect(lambda: self.take_all_user_inputs())
+        self.sequence_of_events()
+        #self.ui.pushButton.clicked.connect(lambda: self.take_all_user_inputs())
 
         #self.result = True
         #self.result = False
@@ -49,7 +59,7 @@ class PurchasePage:
         if self.result:
             # If the card is approved then the customer can move forward to the confirmation page
             # else they need to re-enter their info
-            print(self.result)
+            print("Result = "+ str(self.result))
             self.ui.pushButton.clicked.connect(lambda: self.go_to_confirmation_page())
         else:
             print(self.result)
@@ -75,8 +85,15 @@ class PurchasePage:
         self.ui.CVCinput.setText("")
 
     def set_total(self):
-        # ToDo: Totol is going to be determined by the shopping cart page so this should get the total from there
-        self.total = "50.00"
+        # ToDo: Total is going to be determined by the shopping cart page so this should get the total from there
+        #self.total = "50.00"
+        # ToDo this is to be removed in the final implementation, this is just here for now
+        self.total = str(Decimal(random.randint(1, 50)))
+        print(self.total)
+        # This is how the total will be decided
+        # self.total = self.ui2.cartTotalCostAmount.text()
+        # print(self.total)
+
 
     def make_exp_date(self, month_number, year):
         # Need this function to put the expiration date in the form that the payment processing can handle
@@ -148,24 +165,30 @@ class PurchasePage:
 
     def create_user_card(self):
         #CardChecking.CreditCard.__init__(self.cardNumber, self.expDate, self.cardCode, "987")
-        #new_card = CardChecking.CreditCard
-        #new_card.setNumber(new_card, "4007000000027")
-        #new_card.setExpDate(new_card, "2050-01")
-        #new_card.setCode(new_card, "123")
-        #self.card = new_card
-        #self.card.showInfo(self.card)
         new_card = CardChecking.CreditCard
-        new_card.setNumber(new_card, self.cardNumber)
-        new_card.setExpDate(new_card, self.expDate)
-        new_card.setCode(new_card, self.cardCode)
+        new_card.setNumber(new_card, "4007000000027")
+        new_card.setExpDate(new_card, "2050-01")
+        new_card.setCode(new_card, "123")
         self.card = new_card
         self.card.showInfo(self.card)
 
+        # new_card = CardChecking.CreditCard
+        # new_card.setNumber(new_card, self.cardNumber)
+        # new_card.setExpDate(new_card, self.expDate)
+        # new_card.setCode(new_card, self.cardCode)
+        # self.card = new_card
+        # self.card.showInfo(self.card)
+
+
+
 
     def use_user_card(self):
-        response = CardChecking.purchase(self.card, "50.00")
+        a = str(Decimal(random.randint(1, 100)))
+        print(a)
+        response = CardChecking.purchase(self.card, a)
         self.result = response.success
-        print("Approval:" + str(response.success))
+        print(self.result)
+        #print("Approval:" + str(response.success))
 
     def get_user_info(self, textFilePath):
         file = open(textFilePath, "r")
@@ -184,6 +207,14 @@ class PurchasePage:
 
     def show(self):
         self.main_window.show()
+
+    def sequence_of_events(self):
+        self.take_all_user_inputs()
+        self.create_user_card()
+        self.use_user_card()
+
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
