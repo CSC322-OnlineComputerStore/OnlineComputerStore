@@ -1,0 +1,5 @@
+Windows1, 00001, $1300, This windows machine 1 is ...., windows.png, Windows, 5, 10 
+Windows2, 00002, $1050, This windows machine 2 is ...., windows.png, Windows, 3, 10 
+Mac Pro, 00003, $1600, This Mac machine 1 is ...., macbook-pro.png, Mac OS, 4, 10 
+Mac Air, 00004, $1400, This Mac machine 1 is ...., macbook-pro.png, Mac OS, 7, 10 
+Chrome, 00005, $1000, This chrome machine is ...., chrome.png, Chrome, 8, 10
