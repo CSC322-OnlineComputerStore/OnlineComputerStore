@@ -70,7 +70,7 @@ class registered:
         self.ordersNumber = 0 #sets the number of orders a user has
         self.num = 0 # number of conversations
         #--users will have to finalize order when they press buy, after they finalize they will be taken to the profile page
-        self.ui.submitFinalizeOrderbutton.clicked.connect(self.show_profile_page)
+        self.ui.confirmPayment.clicked.connect(self.show_confirm_order)
     
         self.ui.chatHistoryButton.clicked.connect(self.showMessagesPage)
         
@@ -82,7 +82,7 @@ class registered:
 #        self.ui.submitFinalizeOrderbutton.clicked.connect(lambda x: self.clearCart(self.file))
         
         
-        self.ui.submitFinalizeOrderbutton.clicked.connect(self.newOrder)
+        self.ui.confirmPayment.clicked.connect(self.newOrder)
         self.ui.ordersTableWidget.selectionModel().selectionChanged.connect(self.set_selectedOrder)
        
         # cart table dimensions
@@ -119,6 +119,9 @@ class registered:
     def show_profile_page(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.profilepage)
    
+    def show_confirm_order(self):
+        self.ui.stackedWidget.setCurrentWidget(self.ui.page_3)
+
 
 
 #------------------------code for the chat box to chat with a store clerk -----------------
@@ -519,7 +522,8 @@ class registered:
         else: # if there are items in the cart and therefore the order than the order can be finalized
             self.file = file
             self.showPopUpMessage("Finalize Order", "Please finalize your order")
-            self.ui.stackedWidget.setCurrentWidget(self.ui.finalizeOrderpage)
+            self.ui.stackedWidget.setCurrentWidget(self.ui.confirmPaymentPage)
+            
             
     #will read the cart and also write the new order on the order table
     def clearCart(self, file):
