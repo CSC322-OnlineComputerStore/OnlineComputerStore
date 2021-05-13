@@ -1,7 +1,6 @@
-
 # CSC 322 Project Team X
 # registered customer pages
-# Chelsea Lantigua my copy file
+# Chelsea Lantigua 
 
 import sys
 import os
@@ -13,9 +12,7 @@ from PyQt5.QtWidgets import QMessageBox, QPushButton
 from PyQt5 import QtCore, QtGui, QtWidgets
 from visitorHome import Ui_Homepage
 
-
 countOrders = 0
-
         
 class visitor:
 
@@ -27,13 +24,13 @@ class visitor:
         self.ui.setupUi(self.main_win)
 
         self.ui.stackedWidget.setCurrentWidget(self.ui.homepage)
-#to generate user information like their name
+    #to generate user information like their name
         
         self.generateTopOSHomepage()
         self.generateTopSellersHomepage()
 
         
-#-----homepage navigation bar, home, profile, cart, help
+    #-----homepage navigation bar, home, profile, cart, help
         self.ui.homebutton.clicked.connect(self.show_home_page)
         #hides the OS1cartbuttons
         self.ui.OS1cartbutton1.setHidden(True)
@@ -57,11 +54,10 @@ class visitor:
         self.ui.OS3cartbutton5.setHidden(True)
         self.ui.OS3cartbutton6.setHidden(True)
         
-        
-#        self.ui.cartTableWidget.selectionModel().selectionChanged.connect(self.set_selectedCartItem_info)
-
-#        self.ui.productBuyButton.clicked.connect(self.show_finalize_order_page)
-
+        self.ui.topsellerbutton1.setHidden(True)
+        self.ui.topsellerbutton2.setHidden(True)
+        self.ui.topsellerbutton3.setHidden(True)
+   
     def show(self):
         self.main_win.show()
         
@@ -73,16 +69,15 @@ class visitor:
 
     def show_OS2_page(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.windowspage)
-   
+
     def show_OS3_page(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.chromepage)
         
     def show_item_page(self, product):
         self.generateItem(product)
         self.ui.stackedWidget.setCurrentWidget(self.ui.itempage)
-       
+      
 
-    # will take the info from the 3 OS pages, search for it and then add it to the cart
     def generateItemInfo4(self, nameUI, priceUI):
         name = nameUI.text()
         price = priceUI.text()
@@ -114,49 +109,16 @@ class visitor:
         price = self.ui.topSellerPrice2.text()
         item = self.searchItem(name, price)
         self.add_to_cart(item)
-    # will take the third top seller item's name, price, search for it and then add it to the cart
+    # will take the third top seller item's name, pric
+    
     def generateItemInfo3(self):
         name = self.ui.topsellername3.text()
         price = self.ui.topSellerPrice3.text()
         item = self.searchItem(name, price)
         self.add_to_cart(item)
  
- 
-        
-    def showPopUpMessage(self, title, message):
-        output = QMessageBox()
-        output.setWindowTitle(title)
-        output.setText(message)
-        x = output.exec_()
-    
- 
-            
 
 
-#-----will generate the customer my account page based on a users email
-    def generateProfileInfo(self):
-        search = "al001@gmail.com"
-        myfile = open("userInfo.txt", "r")
-        lines = myfile.readlines()
-        
-        for singleLine in lines:
-            newline = singleLine.strip()
-            userList = newline.split(", ")
-            if(userList[0] == search): #if the user is found based on their email then their info will  be displayed on their profile
-            
-                userEmail = userList[0]
-                userName = userList[1]
-                userID = userList[2]
-                userPaymenCardNumber = userList[3]
-                userPaymentBillingAddress = userList[4]
-                
-                self.ui.myAccountName.setText(userName)
-                self.ui.myAccountUserEmail.setText(userEmail)
-                self.ui.myAccountUserID.setText(userID)
-                self.ui.myAccountUserCardInfo.setText(userPaymenCardNumber)
-                self.ui.myAccountUserBillingInfo.setText(userPaymentBillingAddress)
-        myfile.close()
-   
     #will generate the top os on the homepage
     def generateTopOSHomepage(self):
         osImageButtons = [self.ui.OSimagbutton1, self.ui.OSimagbutton2, self.ui.OSimagbutton3]
@@ -176,7 +138,7 @@ class visitor:
             index = index + 1
         self.ui.topOSLabel.setStyleSheet("font-size: 30pt; text-align: center;")
         self.ui.topSelleLabel.setStyleSheet("font-size: 30pt; text-align: center;")
-    
+
     #reads from the top OS file and creates OS objects from the attributes
     def readTopOS(self):
         myfile = open("topOperatingSystems.txt", "r")
@@ -190,7 +152,7 @@ class visitor:
         return osArray
 
     def generateTopOSPages(self, osTitle, i): # will take in one OS i value from 0 to 2 and determine from the items in inventory if they match to the OS
-    
+
         osImageButtons = [self.ui.OSimagbutton1, self.ui.OSimagbutton2, self.ui.OSimagbutton3] #array of OS image buttons
         seeProductsButtons = [self.ui.seeProductsButton1, self.ui.seeProductsButton2, self.ui.seeProductsButton3] #array of see products  buttons
         showOSpageFunctions = [self.show_OS1_page, self.show_OS2_page, self.show_OS3_page] #array OS pages
@@ -241,18 +203,18 @@ class visitor:
                 position.append(index)  # add the position of the item to a list
             
             index = index + 1
- 
+
         if i == 0:
             self.generateTopOS1Page(items, position)
         elif i == 1:
             self.generateTopOS2Page(items, position)
         else:
             self.generateTopOS3Page(items, position)
- 
+
         osPageTitles[i].setText(osTitle) #sets the title of the page based on the tile of the OS selected
 
         return position
- 
+
     #generates top OS 1 page
     def generateTopOS1Page(self, matchedItems, matchedPosition):
         #top OS page ui components
@@ -260,9 +222,25 @@ class visitor:
         os1ItemNames = [self.ui.OS1name1, self.ui.OS1name2, self.ui.OS1name3, self.ui.OS1name4, self.ui.OS1name5, self.ui.OS1name6] #ui objects for top OS products names
         os1ItemPrice = [self.ui.OS1price1, self.ui.OS1price2, self.ui.OS1price3, self.ui.OS1price4, self.ui.OS1price5, self.ui.OS1price6] #ui objects for top OS products prices
         addCartButtons = [self.ui.OS1cartbutton1, self.ui.OS1cartbutton2, self.ui.OS1cartbutton3, self.ui.OS1cartbutton4, self.ui.OS1cartbutton5, self.ui.OS1cartbutton6] # add to cart buttons
-        self.matchOS(os1ItemNames, os1ItemPrice, os1PageImageButton, matchedItems, matchedPosition, addCartButtons)
+
+        #if any of the add to cart buttons on OS page are pressed then the item is displayed is then added to the cart
+        self.ui.OS1cartbutton1.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name1, self.ui.OS1price1))
+        self.ui.OS1cartbutton2.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name2, self.ui.OS1price2))
+        self.ui.OS1cartbutton3.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name3, self.ui.OS1price3))
+        self.ui.OS1cartbutton4.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name4, self.ui.OS1price4))
+        self.ui.OS1cartbutton5.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name5, self.ui.OS1price5))
+        self.ui.OS1cartbutton6.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS1name6, self.ui.OS1price6))
+        
+        #will match the OS items images to their information
+        self.matchOS( self.ui.OS1name1, self.ui.OS1price1, self.ui.OS1Image1, matchedItems[0], matchedPosition[0], self.ui.OS1cartbutton1)
+        self.matchOS(self.ui.OS1name2, self.ui.OS1price2, self.ui.OS1Image2, matchedItems[1], matchedPosition[1], self.ui.OS1cartbutton2)
+        self.matchOS(self.ui.OS1name3, self.ui.OS1price3, self.ui.OS1Image3, matchedItems[2], matchedPosition[2], self.ui.OS1cartbutton3)
+        self.matchOS(self.ui.OS1name4, self.ui.OS1price4, self.ui.OS1Image4, matchedItems[3], matchedPosition[3], self.ui.OS1cartbutton4)
+        self.matchOS(self.ui.OS1name5, self.ui.OS1price5, self.ui.OS1Image5, matchedItems[4], matchedPosition[4], self.ui.OS1cartbutton5)
+        self.matchOS(self.ui.OS1name6, self.ui.OS1price6, self.ui.OS1Image6, matchedItems[5], matchedPosition[5], self.ui.OS1cartbutton6)
         
         
+
     #generates top OS 2 page
     def generateTopOS2Page(self, matchedItems, matchedPosition):
         
@@ -271,9 +249,24 @@ class visitor:
         os2ItemNames = [self.ui.OS2name1, self.ui.OS2name2, self.ui.OS2name3, self.ui.OS2name4, self.ui.OS2name5, self.ui.OS2name6] #ui objects for top OS products names
         os2ItemPrice = [self.ui.OS2price1, self.ui.OS2price2, self.ui.OS2price3, self.ui.OS2price4, self.ui.OS2price5, self.ui.OS2price6] #ui objects for top OS products prices
         addCartButtons = [self.ui.OS2cartbutton1, self.ui.OS2cartbutton2, self.ui.OS2cartbutton3, self.ui.OS2cartbutton4, self.ui.OS2cartbutton5, self.ui.OS2cartbutton6]
-        self.matchOS(os2ItemNames, os2ItemPrice, os2PageImageButton, matchedItems, matchedPosition, addCartButtons)
-    
 
+        #if any of the add to cart buttons on OS page are pressed then the item is displayed is then added to the cart
+        self.ui.OS2cartbutton1.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name1, self.ui.OS2price1))
+        self.ui.OS2cartbutton2.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name2, self.ui.OS2price2))
+        self.ui.OS2cartbutton3.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name3, self.ui.OS2price3))
+        self.ui.OS2cartbutton4.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name4, self.ui.OS2price4))
+        self.ui.OS2cartbutton5.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name5, self.ui.OS2price5))
+        self.ui.OS2cartbutton6.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS2name6, self.ui.OS2price6))
+        
+        
+        #will match the OS items images to their information
+        self.matchOS( self.ui.OS2name1, self.ui.OS2price1, self.ui.OS2Image1, matchedItems[0], matchedPosition[0], self.ui.OS2cartbutton1)
+        self.matchOS(self.ui.OS2name2, self.ui.OS2price2, self.ui.OS2Image2, matchedItems[1], matchedPosition[1], self.ui.OS2cartbutton2)
+        self.matchOS(self.ui.OS2name3, self.ui.OS2price3, self.ui.OS2Image3, matchedItems[2], matchedPosition[2], self.ui.OS2cartbutton3)
+        self.matchOS(self.ui.OS2name4, self.ui.OS2price4, self.ui.OS2Image4, matchedItems[3], matchedPosition[3], self.ui.OS2cartbutton4)
+        self.matchOS(self.ui.OS2name5, self.ui.OS2price5, self.ui.OS2Image5, matchedItems[4], matchedPosition[4], self.ui.OS2cartbutton5)
+        self.matchOS(self.ui.OS2name6, self.ui.OS2price6, self.ui.OS2Image6, matchedItems[5], matchedPosition[5], self.ui.OS2cartbutton6)
+        
     #generates top OS 3 page
     def generateTopOS3Page(self, matchedItems, matchedPosition):
         #top OS page ui components
@@ -281,68 +274,75 @@ class visitor:
         os3ItemNames = [self.ui.OS3name1, self.ui.OS3name2, self.ui.OS3name3, self.ui.OS3name4, self.ui.OS3name5, self.ui.OS3name6]  #ui objects for top OS products names
         os3ItemPrice = [self.ui.OS3price1, self.ui.OS3price2, self.ui.OS3price3, self.ui.OS3price4, self.ui.OS3price5, self.ui.OS3price6]  #ui objects for top OS products prices
         addCartButtons = [self.ui.OS3cartbutton1, self.ui.OS3cartbutton2, self.ui.OS3cartbutton3, self.ui.OS3cartbutton4, self.ui.OS3cartbutton5, self.ui.OS3cartbutton6]
-        self.matchOS(os3ItemNames, os3ItemPrice, os3PageImageButton, matchedItems, matchedPosition, addCartButtons)
         
+        #if any of the add to cart buttons on OS page are pressed then the item is displayed is then added to the cart
+        self.ui.OS3cartbutton1.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name1, self.ui.OS3price1))
+        self.ui.OS3cartbutton2.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name2, self.ui.OS3price2))
+        self.ui.OS3cartbutton3.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name3, self.ui.OS3price3))
+        self.ui.OS3cartbutton4.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name4, self.ui.OS3price4))
+        self.ui.OS3cartbutton5.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name5, self.ui.OS3price5))
+        self.ui.OS3cartbutton6.clicked.connect(lambda x: self.generateItemInfo4(self.ui.OS3name6, self.ui.OS3price6))
 
+        #will match the OS items images to their information
+        self.matchOS(self.ui.OS3name1, self.ui.OS3price1, self.ui.OS3Image1, matchedItems[0], matchedPosition[0], self.ui.OS3cartbutton1)
+        self.matchOS(self.ui.OS3name2, self.ui.OS3price2, self.ui.OS3Image2, matchedItems[1], matchedPosition[1], self.ui.OS3cartbutton2)
+        self.matchOS(self.ui.OS3name3, self.ui.OS3price3, self.ui.OS3Image3, matchedItems[2], matchedPosition[2], self.ui.OS3cartbutton3)
+        self.matchOS(self.ui.OS3name4, self.ui.OS3price4, self.ui.OS3Image4, matchedItems[3], matchedPosition[3], self.ui.OS3cartbutton4)
+        self.matchOS(self.ui.OS3name5, self.ui.OS3price5, self.ui.OS3Image5, matchedItems[4], matchedPosition[4], self.ui.OS3cartbutton5)
+        self.matchOS(self.ui.OS3name6, self.ui.OS3price6, self.ui.OS3Image6, matchedItems[5], matchedPosition[5], self.ui.OS3cartbutton6)
 
-    #will structure the different products based on their OS. Matches the product attributes to the ui components
-    def matchOS(self, uiNameArray, uiPriceArray, uiImageArray, matchedItems, matchedPosition, addCartButtons):
+    def matchOS(self, uiName, uiPrice, uiImage, matchedItem, matchedPosition, addCartButton):
            
         itemsArray = self.readInventoryTextFile()
-        count = 0 # to repeat the for loop
-        #will traverse throught the lines in the array and store the matched items to the associated Operating system
-        while count <= len(matchedItems) -1:
-            index = matchedPosition[count]
-            itemObject = itemsArray[index]
+       
+        index = matchedPosition
+        itemObject = itemsArray[index]
 
-            itemName = itemObject.getName() #refers to the name
-            uiNameArray[count].setText(itemName)
-            uiNameArray[count].setStyleSheet("font-size: 25pt;")
+        itemName = itemObject.getName() #refers to the name
+        uiName.setText(itemName)
+        uiName.setStyleSheet("font-size: 25pt;")
 
-            itemPrice = itemObject.getPrice() #refers to the price
-            uiPriceArray[count].setText(itemPrice) #refers to the price
-            uiPriceArray[count].setStyleSheet("font-size: 25pt;")
+        itemPrice = itemObject.getPrice() #refers to the price
+        uiPrice.setText(itemPrice) #refers to the price
+        uiPrice.setStyleSheet("font-size: 25pt;")
 
-            itemImage= itemObject.getImage() #refers to the image
-            uiImageArray[count].setIcon(QtGui.QIcon(itemImage))
-            uiImageArray[count].setIconSize(QtCore.QSize(300, 200))
-            
-            uiImageArray[count].clicked.connect(lambda x: self.show_item_page(itemObject))
-            
-            addCartButtons[count].setText("ADD TO CART")
-            addCartButtons[count].setStyleSheet("font-size: 13pt;")
-            addCartButtons
-            
-            
-            addCartButtons[count].setStyleSheet("QPushButton{\n"
-        "    border-radius:15px;\n"
-        "    border-top:2px solid #4a89c7;\n"
-        "    border-bottom:2px solid #4a89c7;\n"
-        "    border-right:2px solid #4a89c7;\n"
-        "    border-left:2px solid #4a89c7;\n"
-        "    background-color:#4A7FC7;\n"
-        "    color:#ffffff;\n"
-        "    padding: 5px;\n"
-        "}\n"
-        "QPushButton:hover{\n"
-        "    color:#ffffff;\n"
-        "    background-color:#84afd9;\n"
-        "    border-top:2px solid #84afd9;\n"
-        "    border-bottom:2px solid #84afd9;\n"
-        "    border-right:2px solid #84afd9;\n"
-        "    border-left:2px solid#84afd9;\n"
-        "}\n"
-        "QPushButton:pressed{\n"
-        "    color:ffffff;\n"
-        "    background-color:#84afd9;\n"
-        "    color:#ffffff;\n"
-        "    border:none;\n"
-        "    border-top:3px solid rgb(178, 84, 84);\n"
-        "    border-right:1px solid rgb(178, 84, 84);\n"
-        "    border-left:2px solid rgb(178, 84, 84);\n"
-        "}")
-                    
-            count = count + 1
+        itemImage= itemObject.getImage() #refers to the image
+        uiImage.setIcon(QtGui.QIcon(itemImage))
+        uiImage.setIconSize(QtCore.QSize(300, 200))
+        
+        uiImage.clicked.connect(lambda x: self.show_item_page(itemObject))
+        
+        addCartButton.setText("ADD TO CART")
+        addCartButton.setStyleSheet("font-size: 13pt;")
+
+        
+        addCartButton.setStyleSheet("QPushButton{\n"
+    "    border-radius:15px;\n"
+    "    border-top:2px solid #4a89c7;\n"
+    "    border-bottom:2px solid #4a89c7;\n"
+    "    border-right:2px solid #4a89c7;\n"
+    "    border-left:2px solid #4a89c7;\n"
+    "    background-color:#4A7FC7;\n"
+    "    color:#ffffff;\n"
+    "    padding: 5px;\n"
+    "}\n"
+    "QPushButton:hover{\n"
+    "    color:#ffffff;\n"
+    "    background-color:#84afd9;\n"
+    "    border-top:2px solid #84afd9;\n"
+    "    border-bottom:2px solid #84afd9;\n"
+    "    border-right:2px solid #84afd9;\n"
+    "    border-left:2px solid#84afd9;\n"
+    "}\n"
+    "QPushButton:pressed{\n"
+    "    color:ffffff;\n"
+    "    background-color:#84afd9;\n"
+    "    color:#ffffff;\n"
+    "    border:none;\n"
+    "    border-top:3px solid rgb(178, 84, 84);\n"
+    "    border-right:1px solid rgb(178, 84, 84);\n"
+    "    border-left:2px solid rgb(178, 84, 84);\n"
+    "}")
 
     #will generate the top sellers on the homepage by looking into the topSeller.txt, creates objects of the items
     def readTopSellers(self):
@@ -390,7 +390,7 @@ class visitor:
     def generateTopSeller1Page(self, item):
         self.matchTopSeller(item, self.ui.topsellername1,  self.ui.topSellerPrice1, self.ui.topSellerImage1)
         ##-----homepage top seller button leads to cart page through the generateItemInfo1 function
-        self.ui.topsellerbutton1.setHidden(True)
+       
                 
 
 
@@ -398,7 +398,6 @@ class visitor:
     def generateTopSeller2Page(self, item):
         self.matchTopSeller(item, self.ui.topsellername2, self.ui.topSellerPrice2, self.ui.topSellerImage2)
         ##-----homepage top seller button leads to cart page through the generateItemInfo2 function
-        self.ui.topsellerbutton2.setHidden(True)
         
                 
 
@@ -407,10 +406,8 @@ class visitor:
     def generateTopSeller3Page(self, item):
         self.matchTopSeller(item, self.ui.topsellername3, self.ui.topSellerPrice3, self.ui.topSellerImage3)
         ##-----homepage top seller button leads to cart page through the generateItemInfo3 function
-        self.ui.topsellerbutton3.setHidden(True)
-
-      
-                
+        self.ui.topsellerbutton3.clicked.connect(lambda x: self.generateItemInfo3())
+     
 
         
     def matchTopSeller(self, item, uiName, uiPrice, uiImage):
@@ -431,78 +428,143 @@ class visitor:
         uiImage.clicked.connect(lambda x: self.show_item_page(item))
         
         
-#will read the inventory textfile and create an array of product objects
+    #will read the inventory textfile and create an array of product objects
     def readInventoryTextFile(self):
-        myfile = open("inventory.txt", "r")
-        lines = myfile.readlines() #list of lines
-        index = 0
-        itemArray = [] #to store the item objects
-        for singleLine in lines: #breaks the list down to lines
-            newline = singleLine.strip() #strips the "\n" from the strings line
-            item = newline.split(", ") #strips strings by the ", " deliminter 6 elements per line now added to new list
-#            del item[0]
-            itemArray.append(product(item[0], item[1], item[2], item[3], item[4], item[5], item[6], item[7])) #array of item objects #adds the item objects to an array
-            index = index + 1
+        myfile = open(self.filepath + "/Products/products.txt", "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsData = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            product = newline.split(", ")
+            allProductsData.append(product)
+     
         myfile.close()
-        return itemArray
+
+        # ID, images
+        myfile = open(self.filepath + "/Products/products_images.txt", "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsImages = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            productImages = newline.split(", ")
+    #            del productImages[0]
+            imageName = productImages[1]
+            allProductsImages.append(imageName)
+
+        myfile.close()
+
+        # ID, description
+        myfile = open(self.filepath+ "/Products/products_descriptions.txt", "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsDescriptions = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            productDescription = newline.split(", ", 1)
+            del productDescription[0]
+            allProductsDescriptions.append(productDescription)
+
+        i = 0
+        for product in allProductsData:
+            product.append(allProductsImages[i])
+            product.append(allProductsDescriptions[i][0])
+            i += 1
+
+        myfile.close()
+
+        path = self.filepath+ "/ProductsImages/"
+        allProducts = []
+        for pData in allProductsData:
+            #ID, name, price, OS, quantity, sold, profit, boughtPrice, images, description
+            allProducts.append(storeProduct(pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7],  pData[8], pData[9]))
+
+        return allProducts
+
+
+
+
+
+
 
 
         
-#    def writeToInventoryTexfile(self, product, userID):
-#        file = userID + "cart.txt"
-#        itemsArray = self.readInventoryTextFile()
-#
-#        #opens the cart file to read
-#        myfile = open(file, "r+")
-#        lines = myfile.readlines()
-#        i = 0
-#        count = 0
-#        index = -1
-#        for singleLine in lines:
-#            newline = singleLine.strip()
-#            userList = newline.split(", ")
-#
-#            ID = userList[1]
-#            quantity = userList[2]
-#
-#            #checks if the item is already in the file
-#            if ID == product.getID():
-#                count += 1
-#                index = i
-#            i += 1
-#        myfile.close()
-#
-#        #opens the cart file to write attributes seperated by a comma
-#        myfile = open(file, "a+")
-#        myfile.write(product.getName())
-#        myfile.write(", ")
-#        myfile.write(product.getID())
-#        myfile.write(", ")
-#        myfile.write(str(1)) #quantity will equal 1
-#        myfile.write(", ")
-#        num = int(product.getPrice().replace("$", ""))
-#        total = num * (1) #stores the total
-#        myfile.write(str(total))
-#        myfile.write("\n")
-#
-#        myfile.close()
-#        return file
-        
-        
-        
-        
-class product:
-    def __init__(self, name, ID, price, description, image, OS, itemsSold, quantity):
+    #will read the inventory textfile and create an array of product objects
+    def readInventoryTextFile(self):
+        myfile = open(self.filepath + "/Products/products.txt", "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsData = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            product = newline.split(", ")
+            allProductsData.append(product)
+     
+        myfile.close()
+
+        # ID, images
+        myfile = open(self.filepath + "/Products/products_images.txt", "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsImages = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            productImages = newline.split(", ")
+    #            del productImages[0]
+            imageName = productImages[1]
+            allProductsImages.append(imageName)
+
+        myfile.close()
+
+        # ID, description
+        myfile = open(self.filepath+ "/Products/products_descriptions.txt", "r")
+        next(myfile)
+        lines = myfile.readlines()
+        allProductsDescriptions = []
+
+        for singleLine in lines:
+            newline = singleLine.strip()
+            productDescription = newline.split(", ", 1)
+            del productDescription[0]
+            allProductsDescriptions.append(productDescription)
+
+        i = 0
+        for product in allProductsData:
+            product.append(allProductsImages[i])
+            product.append(allProductsDescriptions[i][0])
+            i += 1
+
+        myfile.close()
+
+        path = self.filepath+ "/ProductsImages/"
+        allProducts = []
+        for pData in allProductsData:
+            #ID, name, price, OS, quantity, sold, profit, boughtPrice, images, description
+            allProducts.append(storeProduct(pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7],  pData[8], pData[9]))
+
+        return allProducts
+
+
+class storeProduct:
+    def __init__(self, ID, name, price, OS, quantity, sold, profit, boughtPrice, image, description):
         self.name = name
         self.ID = ID
         self.price = price
         self.description = description
         self.image = image
         self.OS = OS
-        self.itemsSold = itemsSold
+        self.sold = sold
         self.quantity = quantity
         self.rate = 0
         self.totalRatingSum = 0
+        self.profit = profit
+
     
     def getName(self):
         return self.name
@@ -524,6 +586,12 @@ class product:
         return self.rate
     def getTotalRatingSum(self):
         return self.totalRatingSum
+    def getProfit(self):
+        return self.profit
+
+        
+        
+        
         
     def setName(self, name):
         self.name = name
@@ -545,6 +613,8 @@ class product:
         self.rate = totalRatingSum/itemsSold
     def setTotalRatingSum(self, totalRatingSum):
         self.totalRatingSum = totalRatingSum
+    def setProfit(self, profit):
+        self.profit = profit
       
 class topSeller:
     def __init__(self, ID):
@@ -567,6 +637,7 @@ class topOS:
         self.name = name
     def setImage(self, image):
         self.image = image
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
