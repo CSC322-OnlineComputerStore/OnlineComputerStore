@@ -293,7 +293,7 @@ border: none;</string>
        <number>15</number>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="homepage">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -943,7 +943,7 @@ QPushButton:pressed{
         <item>
          <widget class="QStackedWidget" name="stackedWidget_2">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page">
            <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -5100,6 +5100,15 @@ QPushButton:pressed{
           </property>
           <property name="styleSheet">
            <string notr="true">font-size: 20pt;</string>
+          </property>
+          <property name="editTriggers">
+           <set>QAbstractItemView::NoEditTriggers</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
           </property>
           <row>
            <property name="text">
