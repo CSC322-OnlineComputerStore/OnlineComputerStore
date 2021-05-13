@@ -1,4 +1,0 @@
-productID, name, sellingPrice, OS, quantity, sold, profit, boughtPrice, weight, rating
-P0, Product1, 300, Windows, 10, 0, 0, 100, 5, None
-P1, Product2, 1700, macOS, 5, 0, 0, 800, 4, None
-P2, Product3, 999, Chrome, 15, 0, 0, 350, 4.5, None

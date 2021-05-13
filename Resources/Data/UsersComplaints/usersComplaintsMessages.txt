@@ -1,3 +1,2 @@
 complaintID, messageToUser
-CT0, That's it!
-CT2, Enough!
+CT0, CT2, Enough!

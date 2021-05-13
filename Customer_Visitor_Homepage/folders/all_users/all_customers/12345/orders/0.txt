@@ -1,0 +1,10 @@
+0
+12345
+2021-05-13 17:59:53.351827
+Pending
+to be set
+Shipping Address
+Store Clerks that handled the order
+Delivery Companies that are delivering the items
+Mac Air 2, 00004, 1, 1100
+Windows1, 00001, 1, 1300

@@ -1,0 +1,10 @@
+1
+12345
+2021-05-13 18:01:03.705742
+Pending
+to be set
+Shipping Address
+Store Clerks that handled the order
+Delivery Companies that are delivering the items
+Windows1, 00001, 1, 1300
+Chrome 1, 00005, 1, 1000
