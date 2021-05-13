@@ -59,32 +59,11 @@ class registered:
 #----users can respond to complaints made against them
         self.ui.theComplaintLeaveMessageButton.clicked.connect(self.respond_complaints_page)
         self.userID = "12345"
-        try:
-            path = os.path.join(self.filepath, 'folders/')
-            os.mkdir(path)
-            path2 = os.path.join(path, 'all_users/')
-            os.mkdir(path2)
-            path3 = os.path.join(path2, 'all_customers/')
-            os.mkdir(path3)
-            path4 = os.path.join(path3, self.userID + "/")
-            os.mkdir(path4)
+      
         
-        
+        self.folderPath = "../StoreClerk_DeliveryCompany_Dashboard/all_users/all_clerks/"
+        self.cartTextfile = "../StoreClerk_DeliveryCompany_Dashboard/all_users/all_customers/"
             
-#            path = os.path.join(self.filepath + 'folders/' +  'all_users/' + 'all_customers/', self.userID + "/")
-#            os.mkdir(path)
-#
-#
-        
-            self.folderPath = path4 # the path to the users folder wil contain an order folder,  conversations folder, cart texfile, and complaints folder.
-            self.cartTextfile = os.path.join(path4, 'cart.txt')
-        
-            file1 = open(self.cartTextfile, "w")
-            file1.close()
-        except:
-            print("error")
-
-
 
 #        self.cartTextfile = self.folderPath + 'cart.txt' # the path for the user's cart
         self.messagesNumber = 0 # sets the number of conversations between a user and store clerk
