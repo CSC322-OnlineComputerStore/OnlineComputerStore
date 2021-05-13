@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import QMessageBox, QPushButton
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from customerHome import Ui_Homepage
-
         
 class registered:
     def __init__(self):
@@ -60,8 +59,34 @@ class registered:
 #----users can respond to complaints made against them
         self.ui.theComplaintLeaveMessageButton.clicked.connect(self.respond_complaints_page)
         self.userID = "12345"
-        self.folderPath = self.filepath + '/folders/all_users/all_customers/' + self.userID + "/" # the path to the users folder wil contain an order folder,  conversations folder, cart texfile, and complaints folder.
-        self.cartTextfile = self.folderPath + 'cart.txt' # the path for the user's cart
+        try:
+            path = os.path.join(self.filepath, 'folders/')
+            os.mkdir(path)
+            path2 = os.path.join(path, 'all_users/')
+            os.mkdir(path2)
+            path3 = os.path.join(path2, 'all_customers/')
+            os.mkdir(path3)
+            path4 = os.path.join(path3, self.userID + "/")
+            os.mkdir(path4)
+        
+        
+            
+#            path = os.path.join(self.filepath + 'folders/' +  'all_users/' + 'all_customers/', self.userID + "/")
+#            os.mkdir(path)
+#
+#
+        
+            self.folderPath = path4 # the path to the users folder wil contain an order folder,  conversations folder, cart texfile, and complaints folder.
+            self.cartTextfile = os.path.join(path4, 'cart.txt')
+        
+            file1 = open(self.cartTextfile, "w")
+            file1.close()
+        except:
+            print("error")
+
+
+
+#        self.cartTextfile = self.folderPath + 'cart.txt' # the path for the user's cart
         self.messagesNumber = 0 # sets the number of conversations between a user and store clerk
         self.ordersNumber = 0 #sets the number of orders a user has
       
@@ -75,8 +100,10 @@ class registered:
         self.ui.chatSendButton.clicked.connect(self.createNewConversation)
         
         #--users will have to finalize order when they press buy, this button will lead them to update their orders page
-        self.ui.submitFinalizeOrderbutton.clicked.connect(lambda x: self.clearCart(self.file))
+#        self.ui.submitFinalizeOrderbutton.clicked.connect(lambda x: self.clearCart(self.file))
         
+        
+        self.ui.submitFinalizeOrderbutton.clicked.connect(self.newOrder)
         self.ui.ordersTableWidget.selectionModel().selectionChanged.connect(self.set_selectedOrder)
        
         # cart table dimensions
@@ -98,6 +125,11 @@ class registered:
 
         #to send a message
         self.ui.sendButton.clicked.connect(self.newmessage_set)
+        
+        self.userWarnings = 0
+        self.userStatus = "Active"
+        self.storeClerkID = 0
+        self.complaintNumber = 0
 
     def show(self):
         self.main_win.show()
@@ -126,7 +158,6 @@ class registered:
         self.userPathName = usersPathName + str(self.messagesNumber) + ".txt"
       
         text = str(self.ui.chatbox.toPlainText())
-        print(text)
         
         if len(text) == 0:
             self.showPopUpMessage("Error", "Error, no message has been entered")
@@ -232,7 +263,6 @@ class registered:
 
     def set_messagelist(self,filename):
         rowNum = self.ui.conversationWidgetTable.rowCount()
-        print(rowNum)
         self.ui.conversationWidgetTable.insertRow(rowNum)
         item1 = QtWidgets.QTableWidgetItem(str(self.messagesNumber -1))
 #            item2 = QtWidgets.QTableWidgetItem(l[i][1])
@@ -261,14 +291,20 @@ class registered:
             path = os.path.join(parent, dir)
             os.mkdir(path)
         
-        print("usersPath = " + str(orderPath))
         self.orderPath = str(orderPath) + str(self.ordersNumber) + ".txt"
         
         myfile = open(self.orderPath, "w+")
         myfile.write(str(self.ordersNumber) + "\n" + str(self.userID)+ "\n" + str(datetime.datetime.now()) + "\n" + "Pending\nto be set\nShipping Address\nStore Clerks that handled the order\nDelivery Companies that are delivering the items\n")
+    
         myfile.close()
-
+        self.clearCart(self.file)
+        
+        self.ordersNumber += 1 #increment the number of messages every time a customer selects the help button. A new conversation will be made
+        lines = self.readOrderInfo(self.orderPath) # writes the order to the table
+        self.set_productlist(lines) # sets the order details on the right table
         return self.orderPath
+        
+        
     #will read the order information from the textfile
     def readOrderInfo(self, file):
         with open(file, "r") as myfile:
@@ -315,8 +351,35 @@ class registered:
         item1 = QtWidgets.QTableWidgetItem(str(totalPrice))  #total price
         item1.setTextAlignment(QtCore.Qt.AlignLeft)
         self.ui.ordersTableWidget.setItem(self.ordersNumber-1,1,item1)
-       
-       
+        
+        return l
+        
+    def set_productlist(self, lines):
+    
+        clerk = str(lines[6])
+        delivery = str(lines[7])
+        count = 0
+        for item in lines[8:]: # will traverse items in l array  at and after index 8 because these will be the products. The product are in the format of lines seperated by commas for their attributes name ID Quantity and price
+            
+            newlist = item.split(", ")
+            id = str(newlist[1]) # product ID
+            name = str(newlist[0]) # name
+            quantity = str(newlist[2]) ##quantity
+
+
+            rowNum = self.ui.OrderSpecificsTableWidget.rowCount()
+            self.ui.OrderSpecificsTableWidget.insertRow(rowNum)
+            item1 = QtWidgets.QTableWidgetItem(id)
+            self.ui.OrderSpecificsTableWidget.setItem(count,0,item1)
+            item2 = QtWidgets.QTableWidgetItem(name)
+            self.ui.OrderSpecificsTableWidget.setItem(count,1,item2)
+            item3 = QtWidgets.QTableWidgetItem(quantity)
+            self.ui.OrderSpecificsTableWidget.setItem(count,2,item3)
+            count += 1
+            
+        self.ui.profilePageStoreClerk1.setText(clerk)
+        self.ui.profilePageDeliveryCompany1.setText(delivery)
+        
     
     #will select a row on the conversations list to view all messages
     def set_selectedOrder(self,selected):
@@ -328,8 +391,7 @@ class registered:
       
         self.selectedOrder= self.ui.ordersTableWidget.item(row,column).text()
         self.orderPath = self.folderPath + "/orders/" + self.selectedOrder + ".txt"
-        self.get_messages(self.orderPath)
-        
+        self.readOrderInfo(self.orderPath)
        
 
     def show_cart_page(self):
@@ -477,21 +539,18 @@ class registered:
             
     #will read the cart and also write the new order on the order table
     def clearCart(self, file):
-        orderFile = self.newOrder()
-        with open(file ,'r') as cartfile, open(orderFile ,'a') as orderfile:
+        with open(file ,'r') as cartfile, open(self.orderPath ,'a') as orderfile:
             # read content from first file
             for line in cartfile:
                 orderfile.write(line)
+                
+        self.ui.cartTableWidget.setRowCount(0)
+        self.ui.cartTotalCostAmount.setText("$0")
         
         file = open(file,"r+")
         file.truncate(0)
         file.close()
         
-        self.ui.cartTableWidget.setRowCount(0)
-        self.ui.cartTotalCostAmount.setText("$0")
-        
-        self.ordersNumber += 1 #increment the number of messages every time a customer selects the help button. A new conversation will be made
-        self.readOrderInfo(orderFile) # writes the order to the table
     
     def show_finalize_order_page(self, file):
         self.checkCart(file)
@@ -518,15 +577,336 @@ class registered:
     def show_profile_warnings_page(self):
         self.ui.stackedWidget2.setCurrentWidget(self.ui.warningspage)
 
+
+
+
+#________________complaints functions _____________
     def make_complaints_page(self):
+        #reads the user type and
         self.ui.stackedWidget2.setCurrentWidget(self.ui.makeComplaintpage)
-    
-    def show_myAccount_page(self):
-        self.ui.stackedWidget2.setCurrentWidget(self.ui.myAccountPage)
+        self.ui.complainAbourUserSubmitButton.clicked.connect(self.checkComplaint)
         
+                
+    def checkComplaint(self):
+        userType = self.readComboBox(self.ui.complainAbourUserTypeComboBox)
+        message = self.ui.complainAbourUserIDDescriptiontextEdit.toPlainText()
+        complaintAboutUserID =  self.ui.userIDTextEdit.toPlainText()
+        orderID = self.ui.orderNumberTextEdit.toPlainText()
+        
+        if userType.lower() == "store clerk":
+            letter = 'S'
+        elif userType.lower() == "delivery company":
+            letter = 'D'
+        elif userType.lower() == "registered customer":
+            letter = 'R'
+        else:
+            letter = 'O'
+        
+        if userType.lower() == "order":
+        #write to orders txt file
+        
+            storeClerk = "N/A"
+            path = "Resources/Data/OrdersComplaints/ordersComplaints.txt"
+            file = open(path, "a")  # append
+            file.write("OC" + str(self.complaintNumber)  + ", OR" + str(orderID) + ", C" + str(complaintAboutUserID) + ", S" + storeClerk + "\n")
+            file.close()
+            
+            path = "Resources/Data/OrdersComplaints/ordersComplaintsDescriptions.txt"
+            file = open(path, "a")  # append
+            file.write("OC" + str(self.complaintNumber)  + ", " + message + "\n")
+            file.close()
+            
+            path = "Resources/Data/OrdersComplaints/ordersComplaintsResponse.txt"
+            file = open(path, "a")  # append
+            file.write("OC" + str(self.complaintNumber)  + ", "+ "N/A" + "\n")
+            file.close()
+            
+            
+        #else the complaint is about another user
+        else:
+        #write to user txtfile
+            path = "Resources/Data/UsersComplaints/usersComplaints.txt"
+            file = open(path, "a")  # append
+            file.write("CT" + str(self.complaintNumber)  + ", C" + str(self.userID) +  ", " + letter + str(userType)+ ", " + "N/A"+ "\n")
+            file.close()
+            
+            path = "Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt"
+            file = open(path, "a")  # append
+            file.write("CT" + str(self.complaintNumber)  + ", C" + str(self.userID) + ", " + message + "\n")
+            file.close()
+
+            managerMessage = "N/A"
+            path = "Resources/Data/UsersComplaints/usersComplaintsJustifications.txt"
+            file = open(path, "a")  # append
+            file.write("CT" + str(self.complaintNumber) + ", " + "N/A" + "\n")
+            file.close()
+
+            #will write into the warnings text
+            otherUserResponse = "N/A"
+            path = "Resources/Data/UsersComplaints/usersComplaintsMessages.txt"
+            file = open(path, "a")  # append
+            file.write("CT" + str(self.complaintNumber) + ", "+ otherUserResponse + "\n")
+            file.close()
+            
+            
+            #will write into the warnings text
+            path = "Resources/Data/UsersComplaints/usersComplaintsWarnings.txt"
+            file = open(path, "a")  # append
+            file.write("CT" + str(self.complaintNumber ) + ", "  + str(self.userWarnings) + "\n")
+            file.close()
+
+        self.complaintNumber += 1 #increment the complaint count
+        
+        self.showPopUpMessage("Complaint Sent", "Your complaint has been sent")
+        self.readComplaintsIHaveMade()
+        self.readComplaintsAboutMe()
+        self.ui.stackedWidget.setCurrentWidget(self.ui.profilepage)
+
+
+    def readComplaintsIHaveMade(self):
+        allComplaints = []
+        
+        #will start with the order complaints
+        with open("Resources/Data/OrdersComplaints/ordersComplaints.txt", "r") as file:
+            lines = file.readlines()
+            
+        with open("Resources/Data/OrdersComplaints/ordersComplaintsDescriptions.txt", "r") as file:
+            lines2 = file.readlines()
+        
+        with open("Resources/Data/OrdersComplaints/ordersComplaintsResponse.txt", "r") as file:
+            lines3 = file.readlines()
+       
+        allLines = []
+        storeLine = []
+        for singleLine in lines:
+            newline = singleLine.strip()
+            line = newline.split(", ")
+            
+            
+            if(str(line[2]) == "C" + str(self.userID)): # the customer has made the complaint
+                storeLine = [line[0], line[1], line[2],line[3]] # stores complaint ID, ORder ID, customerID, and clerk ID
+                #will look for the description from the second file
+                for singleLine in lines2:
+                    newline = singleLine.strip()
+                    line2 = newline.split(", ")
+                    if(str(line2[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line2[1]) #appends the description of the order
+                        break
+                        
+                #will look for the response from the second file
+                for singleLine in lines3:
+                    newline = singleLine.strip()
+                    line3 = newline.split(", ")
+                    if (str(line3[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line3[1]) #appends the response to the order
+                        break
+            allLines.append(storeLine)
+            
+        #will continue with the users complaints
+        with open("Resources/Data/UsersComplaints/usersComplaints.txt", "r") as file:
+            lines = file.readlines()
+            
+        with open("Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt", "r") as file:
+            lines2 = file.readlines()
+        
+        with open("Resources/Data/UsersComplaints/usersComplaintsJustifications.txt", "r") as file:
+            lines3 = file.readlines()
+            
+        with open("Resources/Data/UsersComplaints/usersComplaintsMessages.txt", "r") as file:
+            lines4 = file.readlines()
+        
+        with open("Resources/Data/UsersComplaints/usersComplaintsWarnings.txt", "r") as file:
+            lines5 = file.readlines()
+            
+        for singleLine in lines:
+            newline = singleLine.strip()
+            line = newline.split(", ")
+            
+
+            if(str(line[2]) == "C" + str(self.userID)): # the customer has made the complaint
+     
+                storeLine = [line[0], "N/A", line[1], line[2]]# stores complaint ID, customer userID, and otherUserID
+                
+                #will look for the description from the second file
+                for singleLine in lines2:
+                    newline = singleLine.strip()
+                    line2 = newline.split(", ")
+                    if(str(line[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line2[1]) #appends the description of the order
+                        break
+                    
+                #will look for the justification from the third file
+                for singleLine in lines3:
+                    newline = singleLine.strip()
+                    line3 = newline.split(", ")
+                    if (str(line[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line3[1]) #appends the response to the order
+                        break
+                
+                #will look for the Messages from the second file
+                for singleLine in lines4:
+                    newline = singleLine.strip()
+                    line4 = newline.split(", ")
+                    if(str(line4[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line4[1]) #appends the description of the order
+                        break
+                    
+#                #will look for the warning from the third file
+#                for singleLine in lines5:
+#                    newline = singleLine.strip()
+#                    line5 = newline.split(", ")
+#                    if (str(line5[0]) == storeLine[0]): # find the complaint ID
+#                        print("warning", line5[1])
+#                        storeLine.append(line5[1]) #appends the response to the order
+#                        break
+            allLines.append(storeLine)
+                
+        self.writeComplaintsTable(allLines)
+        
+        
+        
+    def writeComplaintsTable(self, lines):
+        count = 0
+        for i in range(len(lines)):
+            rowNum = self.ui.userComplaintsTableWidget.rowCount()
+            self.ui.userComplaintsTableWidget.insertRow(rowNum)
+            #complaint ID, order num, user ID, clerk ID, message, response
+            item1 = QtWidgets.QTableWidgetItem(str(lines[count][0])) #complaint number
+            self.ui.userComplaintsTableWidget.setItem(count,0,item1)
+            
+            item2 = QtWidgets.QTableWidgetItem(str(lines[count][1])) #order number
+            self.ui.userComplaintsTableWidget.setItem(count,1,item2)
+            
+            item3 = QtWidgets.QTableWidgetItem(str(lines[count][3])) #clerk responding
+            self.ui.userComplaintsTableWidget.setItem(count,2,item3)
+            
+            item4 = QtWidgets.QTableWidgetItem(str(lines[count][2])) #userID
+            self.ui.userComplaintsTableWidget.setItem(count,3,item4)
+            
+            item5 = QtWidgets.QTableWidgetItem(str(lines[count][4])) # description
+            self.ui.userComplaintsTableWidget.setItem(count,4,item5)
+            
+            item6 = QtWidgets.QTableWidgetItem(str(lines[count][5])) #response
+            self.ui.userComplaintsTableWidget.setItem(count,5,item6)
+            
+            item7 = QtWidgets.QTableWidgetItem(str(lines[count][5])) #resolution
+            self.ui.userComplaintsTableWidget.setItem(count,6,item7)
+            
+            count += 1
+            
+            
+            
+    def readComplaintsAboutMe(self):
+        allLines = []
+            
+        #will continue with the users complaints
+        with open("Resources/Data/UsersComplaints/usersComplaints.txt", "r") as file:
+            lines = file.readlines()
+            
+        with open("Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt", "r") as file:
+            lines2 = file.readlines()
+        
+        with open("Resources/Data/UsersComplaints/usersComplaintsJustifications.txt", "r") as file:
+            lines3 = file.readlines()
+            
+        with open("Resources/Data/UsersComplaints/usersComplaintsMessages.txt", "r") as file:
+            lines4 = file.readlines()
+        
+        with open("Resources/Data/UsersComplaints/usersComplaintsWarnings.txt", "r") as file:
+            lines5 = file.readlines()
+            
+        for singleLine in lines:
+            newline = singleLine.strip()
+            line = newline.split(", ")
+            
+
+            if(str(line[1]) == "C" + str(self.userID)): # the customer has made the complaint
+                storeLine = [line[0], line[1], line[2]]# stores complaint ID, customer userID, and otherUserID
+                #will look for the description from the second file
+                for singleLine in lines2:
+                    newline = singleLine.strip()
+                    line2 = newline.split(", ")
+                    if(str(line[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line2[1]) #appends the description of the order
+                        break
+                    
+                #will look for the justification from the third file
+                for singleLine in lines3:
+                    newline = singleLine.strip()
+                    line3 = newline.split(", ")
+                    if (str(line[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line3[1]) #appends the response to the order
+                        break
+                
+                #will look for the Messages from the second file
+                for singleLine in lines4:
+                    newline = singleLine.strip()
+                    line4 = newline.split(", ")
+                    if(str(line4[0]) == storeLine[0]): # find the complaint ID
+                        storeLine.append(line4[1]) #appends the description of the order
+                        break
+          
+            allLines.append(storeLine)
+                            
+        self.writeComplaintsAboutMeTable(allLines)
+        
+    #will write to the complaints about me table
+    def writeComplaintsAboutMeTable(self, lines):
+        count = 0
+        for i in range(len(lines)):
+            rowNum = self.ui.ComplaintsAboutUserTableWidget.rowCount()
+            self.ui.ComplaintsAboutUserTableWidget.insertRow(rowNum)
+            #complaint ID, order num, user ID, clerk ID, message, response
+            item1 = QtWidgets.QTableWidgetItem(str(lines[count][0])) #complaint number
+            self.ui.ComplaintsAboutUserTableWidget.setItem(count,0,item1)
+            
+            item3 = QtWidgets.QTableWidgetItem(str(lines[count][2])) #clerk responding
+            self.ui.ComplaintsAboutUserTableWidget.setItem(count,1,item3)
+            
+            item4 = QtWidgets.QTableWidgetItem(str(lines[count][1])) #userID
+            self.ui.ComplaintsAboutUserTableWidget.setItem(count,2,item4)
+            
+            item5 = QtWidgets.QTableWidgetItem(str(lines[count][3])) # description
+            self.ui.ComplaintsAboutUserTableWidget.setItem(count,3,item5)
+            
+            item6 = QtWidgets.QTableWidgetItem(str(lines[count][4])) #response
+            self.ui.ComplaintsAboutUserTableWidget.setItem(count,4,item6)
+            
+            item7 = QtWidgets.QTableWidgetItem(str(lines[count][5])) #resolution
+            self.ui.ComplaintsAboutUserTableWidget.setItem(count,5,item7)
+            
+            count += 1
+    
+    def respondToComplaints(self):
+        complaintID = self.ui.respondToComplaintlineEdit.text()
+        response = self.ui.respondToComplaintDescriptionTextEdit.text()
+    
+    def respond_to_complaints_page(self):
+        #reads the user type and
+        self.ui.stackedWidget2.setCurrentWidget(self.ui.makeComplaintpage)
+        self.ui.respondToComplaintSubmitButton(self.respondToComplaints())
+        self.ui.complainAbourUserSubmitButton.clicked.connect(self.checkComplaint)
+
+
+
+    def checkResponse(self):
+        complaintID = self.ui.respondToComplaintlineEdit.text()
+        message = self.ui.respondToComplaintDescriptionTextEdit.toPlainText()
+  
+        
+        self.showPopUpMessage("Complaint Response Sent", "Your complaint response has been sent")
+        self.ui.stackedWidget.setCurrentWidget(self.ui.profilepage)
+
+
+
     def respond_complaints_page(self):
         self.ui.stackedWidget2.setCurrentWidget(self.ui.respondToComplaintpage)
+        self.ui.respondToComplaintSubmitButton.clicked.connect(self.checkResponse)
         
+
+    def show_myAccount_page(self):
+        self.ui.stackedWidget2.setCurrentWidget(self.ui.myAccountPage)
+    
     def show_complaints_page(self):
         self.ui.stackedWidget2.setCurrentWidget(self.ui.complaintspage)
 
@@ -1001,6 +1381,9 @@ class registered:
 
         return allProducts
 
+
+
+
 #will display the cart with the items that have been added to it
     def showCartTable(self, file):
         l=[] #to store the different items
@@ -1010,7 +1393,6 @@ class registered:
             for singleLine in lines: #breaks the list down to lines
                 newline = singleLine.strip() #strips the "\n" from the strings line
                 item = newline.split(", ") #strips strings by the ", " delimiter
-                print("ITEM: ", item)
                 total += int(item[3]) # will update the total cost of the items in a cart
                 l.append(item)
 
@@ -1035,7 +1417,6 @@ class registered:
     def readComboBox(self, comboBoxName):
         # finding the content of current item in combo box
         content = comboBoxName.currentText()
-        print("content", content)
         return content
         
     
@@ -1057,6 +1438,8 @@ class registered:
         return item
    
 
+
+        
         
 class storeProduct:
     def __init__(self, ID, name, price, OS, quantity, sold, profit, boughtPrice, image, description):
