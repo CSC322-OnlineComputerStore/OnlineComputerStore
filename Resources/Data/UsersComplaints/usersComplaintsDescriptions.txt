@@ -1,3 +1,0 @@
-complaintID, description
-CT0, I don't like the clerk, fire him.
-CT2, Offensive.

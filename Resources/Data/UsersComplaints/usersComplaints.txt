@@ -1,3 +1,0 @@
-complaintID, fromUserID, toUserID, toUserType
-CT0, C0, S0, Store Clerk
-CT2, C0, S2, Store Clerk

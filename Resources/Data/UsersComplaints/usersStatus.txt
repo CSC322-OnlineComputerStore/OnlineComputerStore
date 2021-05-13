@@ -1,5 +1,0 @@
-userID, status
-C0, Active
-S0, Active
-S1, Active
-S2, Blocked

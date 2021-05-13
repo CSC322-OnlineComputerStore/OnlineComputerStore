@@ -1,4 +1,0 @@
-TopOS
-Windows
-macOS
-Chrome

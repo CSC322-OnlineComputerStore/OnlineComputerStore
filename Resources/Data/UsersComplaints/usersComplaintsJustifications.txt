@@ -1,3 +1,0 @@
-complaintID, justification
-CT0, The customer misbehave, remove him.
-CT2, Lier.
