@@ -59,37 +59,16 @@ class registered:
 #----users can respond to complaints made against them
         self.ui.theComplaintLeaveMessageButton.clicked.connect(self.respond_complaints_page)
         self.userID = "12345"
-        try:
-            path = os.path.join(self.filepath, 'folders/')
-            os.mkdir(path)
-            path2 = os.path.join(path, 'all_users/')
-            os.mkdir(path2)
-            path3 = os.path.join(path2, 'all_customers/')
-            os.mkdir(path3)
-            path4 = os.path.join(path3, self.userID + "/")
-            os.mkdir(path4)
+      
         
-        
+        self.folderPath = "../StoreClerk_DeliveryCompany_Dashboard/all_users/all_clerks/"
+        self.cartTextfile = "../StoreClerk_DeliveryCompany_Dashboard/all_users/all_customers/"
             
-#            path = os.path.join(self.filepath + 'folders/' +  'all_users/' + 'all_customers/', self.userID + "/")
-#            os.mkdir(path)
-#
-#
-        
-            self.folderPath = path4 # the path to the users folder wil contain an order folder,  conversations folder, cart texfile, and complaints folder.
-            self.cartTextfile = os.path.join(path4, 'cart.txt')
-        
-            file1 = open(self.cartTextfile, "w")
-            file1.close()
-        except:
-            print("error")
-
-
 
 #        self.cartTextfile = self.folderPath + 'cart.txt' # the path for the user's cart
         self.messagesNumber = 0 # sets the number of conversations between a user and store clerk
         self.ordersNumber = 0 #sets the number of orders a user has
-      
+        self.num = 0 # number of conversations
         #--users will have to finalize order when they press buy, after they finalize they will be taken to the profile page
         self.ui.submitFinalizeOrderbutton.clicked.connect(self.show_profile_page)
     
@@ -149,14 +128,14 @@ class registered:
   
   #will create a new conversation with a different textfile
     def createNewConversation(self):
-        usersPathName = self.folderPath + "/conversations/"
-        if(os.path.exists(usersPathName) == 0): #if the file does not exists then
-            dir = "conversations/"
-            parent = self.folderPath
-            path = os.path.join(parent, dir)
-            os.mkdir(path)
-        self.userPathName = usersPathName + str(self.messagesNumber) + ".txt"
-      
+        usersPathName = self.folderPath + str(self.userID) + "conversation" +str(self.messagesNumber) + "message" + str(self.num)
+#        if(os.path.exists(usersPathName) == 0): #if the file does not exists then
+#            dir = "conversations/"
+#            parent = self.folderPath
+#            path = os.path.join(parent, dir)
+#            os.mkdir(path)
+#        self.userPathName = usersPathName + str(self.messagesNumber) + ".txt"
+#
         text = str(self.ui.chatbox.toPlainText())
         
         if len(text) == 0:
@@ -189,7 +168,7 @@ class registered:
             
     def newmessage_set(self):
         self.set_message(self.userPathName) #will rewrite the message file with the users new message
-  
+        self.num += 1
     
             
     #will select a row on the conversations list to view all messages
@@ -199,9 +178,10 @@ class registered:
         for ix in selected.indexes():
             row = ix.row()
             column = 0
-      
+
         self.selectedConversation= self.ui.conversationWidgetTable.item(row,column).text()
         self.userPathName = self.folderPath + "/conversations/" +self.selectedConversation + ".txt"
+        self.folderPath + str(self.userID) + "conversation" +str(self.messagesNumber) + "message" +str(self.num)
         self.get_messages(self.userPathName)
         
 
@@ -282,16 +262,16 @@ class registered:
      
   
     def newOrder(self):
-        orderPath = self.folderPath+ "/orders/"
-        clerkspathName = self.filepath+'/folders/all_users/all_clerks/00000/chat' + self.userID + '/'
+#        orderPath = self.folderPath+ str(self.userID) + str(self.ordersNumber)
+#        clerkspathName = self.filepath+'/folders/all_users/all_clerks/00000/chat' + self.userID + '/'
+#
+#        if(os.path.exists(orderPath) == 0): #if the file does not exists then
+#            dir = "orders/"
+#            parent = self.folderPath
+#            path = os.path.join(parent, dir)
+#            os.mkdir(path)
         
-        if(os.path.exists(orderPath) == 0): #if the file does not exists then
-            dir = "orders/"
-            parent = self.folderPath
-            path = os.path.join(parent, dir)
-            os.mkdir(path)
-        
-        self.orderPath = str(orderPath) + str(self.ordersNumber) + ".txt"
+        self.orderPath = self.folderPath + str(self.userID) + "Order" + str(self.ordersNumber) + ".txt"
         
         myfile = open(self.orderPath, "w+")
         myfile.write(str(self.ordersNumber) + "\n" + str(self.userID)+ "\n" + str(datetime.datetime.now()) + "\n" + "Pending\nto be set\nShipping Address\nStore Clerks that handled the order\nDelivery Companies that are delivering the items\n")
@@ -390,9 +370,10 @@ class registered:
             column = 0
       
         self.selectedOrder= self.ui.ordersTableWidget.item(row,column).text()
-        self.orderPath = self.folderPath + "/orders/" + self.selectedOrder + ".txt"
+                        
+        self.orderPath = self.folderPath + str(self.userID) +"Order"+ str(self.selectedOrder) + ".txt"
         self.readOrderInfo(self.orderPath)
-       
+        
 
     def show_cart_page(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.cartpage)
@@ -487,7 +468,10 @@ class registered:
 
     #will read and write to the cart textfile
     def writeToCartTextfile(self, product):
-        file = self.cartTextfile
+    
+        file = self.cartTextfile + "cart" + str(self.userID) + ".txt"
+        f = open(file, "w")
+        f.close()
         itemsArray = self.readInventoryTextFile()
  
         #opens the cart file to read
@@ -606,17 +590,17 @@ class registered:
         #write to orders txt file
         
             storeClerk = "N/A"
-            path = "Resources/Data/OrdersComplaints/ordersComplaints.txt"
+            path = "../Resources/Data/OrdersComplaints/ordersComplaints.txt"
             file = open(path, "a")  # append
             file.write("OC" + str(self.complaintNumber)  + ", OR" + str(orderID) + ", C" + str(complaintAboutUserID) + ", S" + storeClerk + "\n")
             file.close()
             
-            path = "Resources/Data/OrdersComplaints/ordersComplaintsDescriptions.txt"
+            path = "../Resources/Data/OrdersComplaints/ordersComplaintsDescriptions.txt"
             file = open(path, "a")  # append
             file.write("OC" + str(self.complaintNumber)  + ", " + message + "\n")
             file.close()
             
-            path = "Resources/Data/OrdersComplaints/ordersComplaintsResponse.txt"
+            path = "../Resources/Data/OrdersComplaints/ordersComplaintsResponse.txt"
             file = open(path, "a")  # append
             file.write("OC" + str(self.complaintNumber)  + ", "+ "N/A" + "\n")
             file.close()
@@ -625,32 +609,32 @@ class registered:
         #else the complaint is about another user
         else:
         #write to user txtfile
-            path = "Resources/Data/UsersComplaints/usersComplaints.txt"
+            path = "../Resources/Data/UsersComplaints/usersComplaints.txt"
             file = open(path, "a")  # append
             file.write("CT" + str(self.complaintNumber)  + ", C" + str(self.userID) +  ", " + letter + str(userType)+ ", " + "N/A"+ "\n")
             file.close()
             
-            path = "Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt"
+            path = "../Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt"
             file = open(path, "a")  # append
             file.write("CT" + str(self.complaintNumber)  + ", C" + str(self.userID) + ", " + message + "\n")
             file.close()
 
             managerMessage = "N/A"
-            path = "Resources/Data/UsersComplaints/usersComplaintsJustifications.txt"
+            path = "../Resources/Data/UsersComplaints/usersComplaintsJustifications.txt"
             file = open(path, "a")  # append
             file.write("CT" + str(self.complaintNumber) + ", " + "N/A" + "\n")
             file.close()
 
             #will write into the warnings text
             otherUserResponse = "N/A"
-            path = "Resources/Data/UsersComplaints/usersComplaintsMessages.txt"
+            path = "../Resources/Data/UsersComplaints/usersComplaintsMessages.txt"
             file = open(path, "a")  # append
             file.write("CT" + str(self.complaintNumber) + ", "+ otherUserResponse + "\n")
             file.close()
             
             
             #will write into the warnings text
-            path = "Resources/Data/UsersComplaints/usersComplaintsWarnings.txt"
+            path = "../Resources/Data/UsersComplaints/usersComplaintsWarnings.txt"
             file = open(path, "a")  # append
             file.write("CT" + str(self.complaintNumber ) + ", "  + str(self.userWarnings) + "\n")
             file.close()
@@ -667,13 +651,13 @@ class registered:
         allComplaints = []
         
         #will start with the order complaints
-        with open("Resources/Data/OrdersComplaints/ordersComplaints.txt", "r") as file:
+        with open("../Resources/Data/OrdersComplaints/ordersComplaints.txt", "r") as file:
             lines = file.readlines()
             
-        with open("Resources/Data/OrdersComplaints/ordersComplaintsDescriptions.txt", "r") as file:
+        with open("../Resources/Data/OrdersComplaints/ordersComplaintsDescriptions.txt", "r") as file:
             lines2 = file.readlines()
         
-        with open("Resources/Data/OrdersComplaints/ordersComplaintsResponse.txt", "r") as file:
+        with open("../Resources/Data/OrdersComplaints/ordersComplaintsResponse.txt", "r") as file:
             lines3 = file.readlines()
        
         allLines = []
@@ -703,19 +687,19 @@ class registered:
             allLines.append(storeLine)
             
         #will continue with the users complaints
-        with open("Resources/Data/UsersComplaints/usersComplaints.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaints.txt", "r") as file:
             lines = file.readlines()
             
-        with open("Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt", "r") as file:
             lines2 = file.readlines()
         
-        with open("Resources/Data/UsersComplaints/usersComplaintsJustifications.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsJustifications.txt", "r") as file:
             lines3 = file.readlines()
             
-        with open("Resources/Data/UsersComplaints/usersComplaintsMessages.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsMessages.txt", "r") as file:
             lines4 = file.readlines()
         
-        with open("Resources/Data/UsersComplaints/usersComplaintsWarnings.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsWarnings.txt", "r") as file:
             lines5 = file.readlines()
             
         for singleLine in lines:
@@ -771,26 +755,26 @@ class registered:
             rowNum = self.ui.userComplaintsTableWidget.rowCount()
             self.ui.userComplaintsTableWidget.insertRow(rowNum)
             #complaint ID, order num, user ID, clerk ID, message, response
-            item1 = QtWidgets.QTableWidgetItem(str(lines[count][0])) #complaint number
-            self.ui.userComplaintsTableWidget.setItem(count,0,item1)
+            item1 = QtWidgets.QTableWidgetItem(str(lines[rowNum][0])) #complaint number
+            self.ui.userComplaintsTableWidget.setItem(rowNum,0,item1)
             
-            item2 = QtWidgets.QTableWidgetItem(str(lines[count][1])) #order number
-            self.ui.userComplaintsTableWidget.setItem(count,1,item2)
+            item2 = QtWidgets.QTableWidgetItem(str(lines[rowNum][1])) #order number
+            self.ui.userComplaintsTableWidget.setItem(rowNum,1,item2)
             
-            item3 = QtWidgets.QTableWidgetItem(str(lines[count][3])) #clerk responding
-            self.ui.userComplaintsTableWidget.setItem(count,2,item3)
+            item3 = QtWidgets.QTableWidgetItem(str(lines[rowNum][3])) #clerk responding
+            self.ui.userComplaintsTableWidget.setItem(rowNum,2,item3)
             
-            item4 = QtWidgets.QTableWidgetItem(str(lines[count][2])) #userID
-            self.ui.userComplaintsTableWidget.setItem(count,3,item4)
+            item4 = QtWidgets.QTableWidgetItem(str(lines[rowNum][2])) #userID
+            self.ui.userComplaintsTableWidget.setItem(rowNum,3,item4)
             
-            item5 = QtWidgets.QTableWidgetItem(str(lines[count][4])) # description
-            self.ui.userComplaintsTableWidget.setItem(count,4,item5)
+            item5 = QtWidgets.QTableWidgetItem(str(lines[rowNum][4])) # description
+            self.ui.userComplaintsTableWidget.setItem(rowNum,4,item5)
             
-            item6 = QtWidgets.QTableWidgetItem(str(lines[count][5])) #response
-            self.ui.userComplaintsTableWidget.setItem(count,5,item6)
+            item6 = QtWidgets.QTableWidgetItem(str(lines[rowNum][5])) #response
+            self.ui.userComplaintsTableWidget.setItem(rowNum,5,item6)
             
-            item7 = QtWidgets.QTableWidgetItem(str(lines[count][5])) #resolution
-            self.ui.userComplaintsTableWidget.setItem(count,6,item7)
+            item7 = QtWidgets.QTableWidgetItem(str(lines[rowNum][5])) #resolution
+            self.ui.userComplaintsTableWidget.setItem(rowNum,6,item7)
             
             count += 1
             
@@ -800,19 +784,19 @@ class registered:
         allLines = []
             
         #will continue with the users complaints
-        with open("Resources/Data/UsersComplaints/usersComplaints.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaints.txt", "r") as file:
             lines = file.readlines()
             
-        with open("Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt", "r") as file:
             lines2 = file.readlines()
         
-        with open("Resources/Data/UsersComplaints/usersComplaintsJustifications.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsJustifications.txt", "r") as file:
             lines3 = file.readlines()
             
-        with open("Resources/Data/UsersComplaints/usersComplaintsMessages.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsMessages.txt", "r") as file:
             lines4 = file.readlines()
         
-        with open("Resources/Data/UsersComplaints/usersComplaintsWarnings.txt", "r") as file:
+        with open("../Resources/Data/UsersComplaints/usersComplaintsWarnings.txt", "r") as file:
             lines5 = file.readlines()
             
         for singleLine in lines:
@@ -1326,7 +1310,7 @@ class registered:
         
 #will read the inventory textfile and create an array of product objects
     def readInventoryTextFile(self):
-        myfile = open(self.filepath+ '/Resources/Data/Products/products.txt', "r")
+        myfile = open(self.filepath + "/Products/products.txt", "r")
         next(myfile)
         lines = myfile.readlines()
         allProductsData = []
@@ -1339,7 +1323,7 @@ class registered:
         myfile.close()
 
         # ID, images
-        myfile = open(self.filepath+ '/Resources/Data/Products/products_images.txt', "r")
+        myfile = open(self.filepath + "/Products/products_images.txt", "r")
         next(myfile)
         lines = myfile.readlines()
         allProductsImages = []
@@ -1354,7 +1338,7 @@ class registered:
         myfile.close()
     
         # ID, description
-        myfile = open(self.filepath+ '/Resources/Data/Products/products_descriptions.txt', "r")
+        myfile = open(self.filepath+ "/Products/products_descriptions.txt", "r")
         next(myfile)
         lines = myfile.readlines()
         allProductsDescriptions = []
@@ -1373,7 +1357,7 @@ class registered:
 
         myfile.close()
 
-        path = self.filepath+ "/Resources/ProductsImages/"
+        path = self.filepath+ "/ProductsImages/"
         allProducts = []
         for pData in allProductsData:
             #ID, name, price, OS, quantity, sold, profit, boughtPrice, images, description
@@ -1535,4 +1519,5 @@ if __name__ == '__main__':
 
     sys.exit(app.exec_())
     
+
 
