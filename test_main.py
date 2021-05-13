@@ -11,6 +11,7 @@ class test_main:
     def __init__(self):
         self.filepath = os.getcwd()
         self.selectedOrderno, self.selectedCustomerno, self.selectedProductno = 0,0,0
+        self.userid='00001'
         self.main_win = QMainWindow() 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self.main_win)
@@ -27,8 +28,8 @@ class test_main:
         self.ui.order_bet_table.selectionModel().selectionChanged.connect(self.set_selectedorder_info)
 
     def set(self):
-        self.set_bets(self.filepath+'all_orders'+'/all_bets/'+self.selectedOrderno)
-        self.get_bets(self.filepath+'all_orders'+'/all_bets/'+self.selectedOrderno)
+        self.set_bets(self.filepath+'all_orders/orders/'+self.selectedOrderno+'/bet.txt')
+        self.get_bets(self.filepath+'all_orders/orders/'+self.selectedOrderno+'/bet.txt')
 
     def show(self):
         self.main_win.show()
@@ -39,7 +40,7 @@ class test_main:
 
 
     def show_bet_page(self):
-        self.get_order(self.filepath+'/all_orders/'+'order_count')
+        self.get_order(self.filepath+'/all_orders/'+'order_count.txt')
         self.ui.stackedWidget.setCurrentWidget(self.ui.bet_page)
         self.ui.header_label.setText("View Bets")
 
@@ -57,7 +58,7 @@ class test_main:
         l=[]
         k=[]
         bet=self.ui.bet_enter.text()
-        company="delivery"
+        company = self.return_file_content(self.filepath+'/all_users/all_deliverys/'+self.userid+'/info.txt')[1].replace("\n","")
         with open(filename, "r") as myfile:
             lines=myfile.readlines()
             l.append(lines)
@@ -67,7 +68,7 @@ class test_main:
             k+=l[i]
         if not("." in bet):
             bet=bet+".00"
-        k.append(bet+" "+company)
+        k.append(bet+" "+company+" "+self.userid)
         with open(filename,"w") as file:
             file.writelines(k)
             file.close()
@@ -83,7 +84,7 @@ class test_main:
         self.selectedProductno= self.ui.order_bet_table.item(row,2).text()
         self.selectedCustomerno= self.ui.order_bet_table.item(row,1).text()
         self.get_bets(self.filepath+'/all_orders/all_bets/'+self.selectedOrderno)
-        self.set_customer_info(self.filepath+'/all_users/'+'/all_customers/'+self.selectedCustomerno+'/info')
+        self.set_customer_info(self.filepath+'/all_users/'+'/all_customers/'+self.selectedCustomerno+'/info.txt')
         self.set_product_info(self.filepath+'/all_products/'+self.selectedProductno+'/info')
         self.set_order_info(self.filepath+'/all_orders/orders/'+self.selectedOrderno)
        
@@ -167,7 +168,12 @@ class test_main:
                 item.setTextAlignment(QtCore.Qt.AlignCenter)
                 self.ui.order_bet_table.setItem(i,j,item)
 
-
+    def return_file_content(self,filename):
+        l=[]
+        with open(filename, "r") as myfile:
+            lines=myfile.readlines()
+            l=lines
+        return l
 
 
 

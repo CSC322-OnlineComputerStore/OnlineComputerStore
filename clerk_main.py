@@ -25,10 +25,12 @@ class clerk_main:
         
         #orderstab
         self.ui.view_order_button.clicked.connect(self.show_order_page)
+        self.ui.completed_order_table.selectionModel().selectionChanged.connect(self.set_selectedcompleteorder_info)
 
         #betstab
         self.ui.order_bet_table.selectionModel().selectionChanged.connect(self.set_selectedorder_info)
         self.ui.view_bets_button.clicked.connect(self.show_bet_page)
+        self.ui.select_bet_button.clicked.connect(self.select_bet)
 
         #conversations
         self.ui.conversation_table.selectionModel().selectionChanged.connect(self.set_selected_message)
@@ -50,16 +52,143 @@ class clerk_main:
 
     #ordertab code        
     def show_order_page(self):
+        self.get_completed_order(self.filepath+"/all_users/all_clerks/"+self.userid+"/orders/ordercount.txt")
         self.ui.stackedWidget.setCurrentWidget(self.ui.order_page)
         self.ui.header_label.setText("View Order")
 
+    #ordertab code
+    def get_completed_order(self,filename):
+        l=[]
+        k=[]
+        m=[]
+        n=[]
+        lines = self.return_file_content(filename)
+        lines = self.remove_n(lines)
+        for i in range(len(lines)):
+            l.append(self.return_file_content(self.filepath+"/all_users/all_clerks/"+self.userid+"/orders/"+lines[i]+".txt"))
+            
+        for i in range(len(l)):
+            k.append(l[i][0].replace("\n",""))
+            k.append(l[i][2].replace("\n",""))
+            k.append(l[i][1].replace("\n",""))
+            k.append((l[i][7]).split(" ")[0])
+            k.append(l[i][3].replace("\n",""))
+            n.append(k)
+            k=[]
+        self.ui.completed_order_table.setRowCount(len(n))
+        for i in range(len(n)):
+            for j in range(len(n[i])):
+                item = QtWidgets.QTableWidgetItem(n[i][j])
+                item.setTextAlignment(QtCore.Qt.AlignCenter)
+                self.ui.completed_order_table.setItem(i,j,item)
+
+    def set_selectedcompleteorder_info(self,selected):
+        row=0
+        column=0
+        for ix in selected.indexes():
+            row = ix.row()
+        deliveryid = self.ui.completed_order_table.item(row,3).text().replace('\n','')
+        customerid = self.ui.completed_order_table.item(row,2).text().replace('\n','')
+        orderno = self.ui.completed_order_table.item(row,0).text().replace("\n","")
+        
+        orderinfolist = self.return_file_content(self.filepath+'/all_users/all_clerks/'+self.userid+'/orders/'+orderno+'.txt')
+        orderinfolist = self.remove_n(orderinfolist)
+        deliverycharge = (orderinfolist[7].split(" ")[1]).replace('\n','')
+        productidlist = []
+        for i in range(8,len(orderinfolist)):
+            productidlist.append(orderinfolist[i].split(","))
+        packageweight,packageprice = 0,0
+        #productidlist = self.remove_n(productidlist)
+
+        self.ui.ordernoc_label.setText(orderno)
+
+            #packageweight += float((self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[2]).replace('\n',''))
+            #packageprice += float((self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[3]).replace('\n',''))
+        for i in range(len(productidlist)):
+            packageprice_temp =self.return_file_content(self.filepath+'/all_products/'+productidlist[i][1].replace(" ","")+'/info.txt')[3].replace('\n','')
+            packageprice = packageprice + float(packageprice_temp.replace('$','')) 
+            #packageprice_temp =self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[3].replace('\n','')
+            #packageprice = packageprice + float(packageprice_temp.replace('$','')) 
+        #self.ui.packageweight_label.setText("Package Weight: "+ str (packageweight))
+        self.ui.packagepricec_label.setText("Price: $"+ str (packageprice))
+        self.ui.numberofproductsc_label.setText("Number of Products:"+str(len(productidlist)))
+
+        self.ui.orderdate_label.setText("Date: "+orderinfolist[2].replace("\n",""))
+
+        customerinfolist = self.return_file_content(self.filepath+'/all_users/'+'/all_customers/'+customerid+'/info.txt')
+        customerinfolist = self.remove_n(customerinfolist)
+        self.ui.customernamec_label.setText(customerinfolist[1])
+        self.ui.addressline1c_label.setText(customerinfolist[6])
+        self.ui.addressline2c_label.setText(customerinfolist[7])
+        self.ui.cityc_label.setText(customerinfolist[8])
+        self.ui.statec_label.setText(customerinfolist[9])
+        self.ui.zipc_label.setText(customerinfolist[10])
+
+        self.ui.deliverycompanyc_label.setText("Delivery Company:"+((self.return_file_content(self.filepath+"/all_users/all_deliverys/"+deliveryid+"/info.txt"))[1]).replace("\n",""))
+        self.ui.deliverychargec_label.setText("Delivery Charge: $"+deliverycharge)
+        self.ui.trackingidc_label.setText("Tracking ID: "+orderinfolist[4])
+        self.ui.statusc_label.setText("Status: "+orderinfolist[3])
+        self.ui.clerkc_label.setText("Clerk: "+((self.return_file_content(self.filepath+"/all_users/all_clerks/"+orderinfolist[6]+"/info.txt"))[1]).replace("\n",""))
 
     #betstab code
     def show_bet_page(self):
-        self.get_order(self.filepath+'/all_orders/'+'order_count')
+        self.get_order(self.filepath+'/all_orders/'+'order_count.txt')
         self.ui.stackedWidget.setCurrentWidget(self.ui.bet_page)
         self.ui.header_label.setText("View Bets")
-    
+
+    def select_bet(self):
+        indexes = self.ui.all_bets_table.selectionModel().selectedRows()
+        row=0
+        row2=0
+        for index in sorted(indexes):
+            row=index.row()
+        deliveryid = self.ui.all_bets_table.item(row,2).text()
+        price = self.ui.all_bets_table.item(row,0).text()
+        customerid = self.ui.customerid_label.text()
+        selectedOrderno = self.ui.orderno_label.text()
+        
+        orderinfolist = self.return_file_content(self.filepath+'/all_orders/orders/'+selectedOrderno+'/info.txt')
+        orderinfolist[1] = customerid+"\n"
+        orderinfolist[3] = "Processing\n"
+        orderinfolist[6] = self.userid+"\n"
+        orderinfolist[7] = deliveryid+" "+price+"\n"
+
+        ordercountdelivery = self.return_file_content(self.filepath+"/all_users/all_deliverys/"+deliveryid+"/orders/ordercount.txt")
+        ordercountclerk = self.return_file_content(self.filepath+"/all_users/all_clerks/"+self.userid+"/orders/ordercount.txt")
+        ordercountorder = self.return_file_content(self.filepath+"/all_orders/order_count.txt")
+        
+        ordercountdelivery.append(selectedOrderno+"\n");ordercountclerk.append(selectedOrderno+"\n") 
+
+        temp=[]
+        for i in range(len(ordercountorder)):
+            a = ordercountorder[i].split(" ")
+            temp.append(a)
+        ordercountorder_temp = temp
+
+        for i in range(len(ordercountorder_temp)):
+            if(ordercountorder_temp[i][0]==selectedOrderno):
+                ordercountorder[i]=ordercountorder_temp[i][0]+" "+ordercountorder_temp[i][1]+" "+ordercountorder_temp[i][2]+" "+"Processing\n"
+
+        filename_delivery=self.filepath+"/all_users/all_deliverys/"+deliveryid+"/orders/"+selectedOrderno+".txt"
+        filename_clerk=self.filepath+"/all_users/all_clerks/"+self.userid+"/orders/"+selectedOrderno+".txt"
+        
+        with open(filename_delivery,"w") as file:
+            file.writelines(orderinfolist)
+            file.close()
+        with open(filename_clerk,"w") as file:
+            file.writelines(orderinfolist)
+            file.close()
+        with open(self.filepath+"/all_users/all_deliverys/"+deliveryid+"/orders/ordercount.txt","w") as file:
+            file.writelines(ordercountdelivery)
+            file.close()
+        with open(self.filepath+"/all_users/all_clerks/"+self.userid+"/orders/ordercount.txt","w") as file:
+            file.writelines(ordercountclerk)
+            file.close()
+        with open(self.filepath+"/all_orders/order_count.txt","w") as file:
+            file.writelines(ordercountorder)
+            file.close()
+        self.show_bet_page
+        
 
     def set_selectedorder_info(self,selected):
         row=0
@@ -70,17 +199,26 @@ class clerk_main:
         selectedCustomerno= self.ui.order_bet_table.item(row,1).text()
         orderinfolist = self.return_file_content(self.filepath+'/all_orders/orders/'+selectedOrderno+'/info.txt')
         orderinfolist = self.remove_n(orderinfolist)
-        productidlist = orderinfolist[3].split(' ')
+        productidlist = []
+        for i in range(8,len(orderinfolist)):
+            productidlist.append(orderinfolist[i].split(","))
         packageweight,packageprice = 0,0
-        for i in range(len(productidlist)):
-            packageweight += float((self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[2]).replace('\n',''))
+        #productidlist = self.remove_n(productidlist)
+
+        self.ui.orderno_label.setText(selectedOrderno)
+
+            #packageweight += float((self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[2]).replace('\n',''))
             #packageprice += float((self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[3]).replace('\n',''))
-            packageprice_temp =self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[3].replace('\n','')
+        for i in range(len(productidlist)):
+            packageprice_temp =self.return_file_content(self.filepath+'/all_products/'+productidlist[i][1].replace(" ","")+'/info.txt')[3].replace('\n','')
             packageprice = packageprice + float(packageprice_temp.replace('$','')) 
-        self.ui.packageweight_label.setText("Package Weight: "+ str (packageweight))
+            #packageprice_temp =self.return_file_content(self.filepath+'/all_products/'+productidlist[i]+'/info.txt')[3].replace('\n','')
+            #packageprice = packageprice + float(packageprice_temp.replace('$','')) 
+        #self.ui.packageweight_label.setText("Package Weight: "+ str (packageweight))
         self.ui.packageprice_label.setText("Price: $"+ str (packageprice))
         self.ui.numberofproducts_label.setText("Number of Products:"+str(len(productidlist)))
 
+        self.ui.orderdate_label.setText("Date: "+orderinfolist[2].replace("\n",""))
 
         customerinfolist = self.return_file_content(self.filepath+'/all_users/'+'/all_customers/'+selectedCustomerno+'/info.txt')
         customerinfolist = self.remove_n(customerinfolist)
@@ -90,6 +228,7 @@ class clerk_main:
         self.ui.addresscity_label.setText(customerinfolist[8])
         self.ui.addressstate_label.setText(customerinfolist[9])
         self.ui.addresszip_label.setText(customerinfolist[10])
+        self.ui.customerid_label.setText(selectedCustomerno)
 
 
         self.get_bets(self.filepath+'/all_orders/orders/'+selectedOrderno+'/bet.txt')
@@ -151,18 +290,18 @@ class clerk_main:
         k=[]
         m=[]
         n=[]
-        with open(filename, "r") as myfile:
-            lines=myfile.read().split(",")
-            l.append(lines)
-        for i in range(len(l)):
-            k+=l[i]
-        l=[k[i:i+4] for i in range (0, len(k),4)]
+        lines = self.return_file_content(filename)
+        for i in range(len(lines)):
+            b=lines[i].split(" ")
+            b=self.remove_n(b)
+            l.append(b)
         for i in range(len(l)):
             if(l[i][len(l[i])-1]=="pending"):
                 for j in range(len(l[i])-1):
                     l[i][j]=l[i][j].replace('\n','')
                     m.append(l[i][j])
         n=[m[i:i+3] for i in range (0, len(m),3)]
+        self.ui.order_bet_table.setRowCount(0)
         self.ui.order_bet_table.setRowCount(len(n))
         for i in range(len(n)):
             for j in range(len(n[i])):
@@ -170,6 +309,18 @@ class clerk_main:
                 item.setTextAlignment(QtCore.Qt.AlignCenter)
                 self.ui.order_bet_table.setItem(i,j,item)
 
+    def return_order_count(self,filename):
+        l=[]
+        k=[]
+        m=[]
+        n=[]
+        with open(filename, "r") as myfile:
+            lines=myfile.read().split(",")
+            l.append(lines)
+        for i in range(len(l)):
+            k+=l[i]
+        l=[k[i:i+4] for i in range (0, len(k),4)]
+        return l            
 
     
     #messagetab code
