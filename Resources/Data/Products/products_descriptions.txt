@@ -1,4 +1,3 @@
 productID, Description
-1, This is the first product description, product1.
-2, This is the Second product description, product2.
-3, This is the Third product description, product3.
+
+C0, None

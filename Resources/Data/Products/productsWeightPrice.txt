@@ -1,0 +1,3 @@
+productID, name, weight, price
+
+C0, None, 0, 0
