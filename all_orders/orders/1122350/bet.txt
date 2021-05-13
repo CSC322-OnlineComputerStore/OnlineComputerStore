@@ -1,0 +1,6 @@
+12.00 Fedex 00001
+13.00 Usps 00002
+11.00 Usps 00002
+21.00 delivery 00003
+33.00 delivery 00003
+100.00 delivery 00003
