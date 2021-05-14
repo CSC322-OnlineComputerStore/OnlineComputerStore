@@ -1,0 +1,19 @@
+productID, Description
+00001, This is the first product description, product1.
+00002, This is the second product description, product2.
+00003, This is the third product description, product3.
+00004, This is the fourth product description, product4.
+00005, This is the five product description, product5.
+00006, This is the sixth product description, product6.
+00007, This is the seventh product description, product7.
+00008, This is the eighth product description, product8.
+00009, This is the ninth product description, product9.
+00010, This is the tenth product description, product10.
+00011, This is the eleventh product description, product11.
+00012, This is the twelfth product description, product12.
+00013, This is the thirteenth product description, product13.
+00014, This is the fourteenth product description, product14.
+00015, This is the five-tenth product description, product15.
+00016, This is the sixteenth product description, product16.
+00017, This is the eighteenth product description, product17.
+00018, This is the ninteenth product description, product18.
