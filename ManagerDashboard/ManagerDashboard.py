@@ -3,9 +3,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets, uic
 # from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow, QLabel, QGridLayout, QWidget, QTableWidget, QTableWidgetItem
 # from PyQt5.QtGui import QPixmap
 from pathlib import Path
-from PyQt5.QtWidgets import * 
-from PyQt5.QtGui import * 
-from PyQt5.QtCore import * 
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 import shutil
 import fileinput
 
@@ -86,7 +86,7 @@ class manager():
 
         # Display Product Info
         self.ui.Products_tableWidget.selectionModel().selectionChanged.connect(self.displayProductInfo)
-        
+
         # Display all complaints
         self.ui.Complaints_pushButton.clicked.connect(self.displayAllComplaints)
 
@@ -108,7 +108,7 @@ class manager():
         # Block Store Clerk
         self.ui.StoreClerk_Block_pushButton.clicked.connect(self.blockStoreClerk)
 
-        # Activate Store Clerk 
+        # Activate Store Clerk
         self.ui.StoreClerk_Activate_pushButton.clicked.connect(self.activateStoreClerk)
 
         # Display all Delivery Companies
@@ -151,7 +151,7 @@ class manager():
 
 
 #-------------Products Page Functions-------------#
-                
+
     def displayTopOS(self):
         # Display on screen
         # save all topOS1/2/3_ComboBox.currentText() value on text File
@@ -254,7 +254,7 @@ class manager():
 
         except Exception as e:
             print('setTopOS(): Cannot proceed, something went wrong.\n', e)
-            
+
     def setAllProducts(self):
         try:
             # ID, name, price, OS, quantity, sold, profit, boughtPrice, weight, rating, images, description
@@ -342,7 +342,7 @@ class manager():
                     self.ui.Products_tableWidget.setItem(row, column, QTableWidgetItem(str(p[column])))
 
                 row = row+1
-            
+
         except Exception as e:
             print('displayAllProducts(): Cannot proceed, something went wrong.\n', e)
 
@@ -370,12 +370,12 @@ class manager():
             # 0:ID, 1:name, 2:price, 3:OS, 4:quantity, 5:sold, 6:profit, 7:boughtPrice, 8:weight, 9:rating, 10:images, 11:description
             p = storeProduct(pId, "None", "0", "None", "0", "0", "0", "0", "0", "None", ["None"]*5, "None")
             self.allStoreProducts.append(p)
-            
-            pInfo = (str(p.getID()) + ", " + str(p.getName()) + ", " + str(p.getPrice()) + ", " + str(p.getOperatingSystem()) + ", " 
-                  + str(p.getQuantity()) + ", " + str(p.getQuantitySold()) + ", " + str(p.getProfit()) + ", " 
+
+            pInfo = (str(p.getID()) + ", " + str(p.getName()) + ", " + str(p.getPrice()) + ", " + str(p.getOperatingSystem()) + ", "
+                  + str(p.getQuantity()) + ", " + str(p.getQuantitySold()) + ", " + str(p.getProfit()) + ", "
                   + str(p.getBoughtPrice()) + ", " + str(p.getWeight()) + ", " + str(p.getRating()))
 
-            pImages = (str(p.getID()) + ", " + str(p.getImages()[0]) + ", " + str(p.getImages()[1]) + ", " + str(p.getImages()[2]) + ", " 
+            pImages = (str(p.getID()) + ", " + str(p.getImages()[0]) + ", " + str(p.getImages()[1]) + ", " + str(p.getImages()[2]) + ", "
                     + str(p.getImages()[3]) + ", " + str(p.getImages()[4]))
 
             pDescription = str(p.getID()) + ", " + str(p.getDescription())
@@ -383,7 +383,7 @@ class manager():
             with open("../Resources/Data/Products/products.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(pInfo)
-            
+
             with open("../Resources/Data/Products/products_images.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(pImages)
@@ -391,8 +391,8 @@ class manager():
             with open("../Resources/Data/Products/products_descriptions.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(pDescription)
-            
-            pWeightPrice = str(p.getID()) + ", " + str(p.getName()) + ", " + str(p.getPrice()) + ", " + str(p.getWeight()) 
+
+            pWeightPrice = str(p.getID()) + ", " + str(p.getName()) + ", " + str(p.getPrice()) + ", " + str(p.getWeight())
             with open("../Resources/Data/Products/productsWeightPrice.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(pWeightPrice)
@@ -412,7 +412,7 @@ class manager():
                     if(p.getID() == pId):
                         selectedProduct = p
                         break
-                
+
                 self.ui.ProductID_Label.setText(selectedProduct.getID())
 
                 self.ui.productName_lineEdit.setText(selectedProduct.getName())
@@ -455,7 +455,7 @@ class manager():
         try:
             fileName = QFileDialog.getOpenFileName()
             filePath = fileName[0]
-            
+
             imageButton.setText("")
             imageButton.setIcon(QIcon(filePath))
 
@@ -468,7 +468,7 @@ class manager():
                 if(p.getID() == pId):
                     selectedProduct = p
                     break
-            
+
             fileExt = filePath.split(".")[-1]
             imageName = str(selectedProduct.getID()) + "_Image_" + str(imageNumber)+"."+fileExt
 
@@ -476,10 +476,10 @@ class manager():
 
             # Directory
             directory = str(selectedProduct.getID())
-            
+
             # Parent Directory path
             parent_dir = '../Resources/Data/Products/ProductsImages/'
-            
+
             # Path
             thePath = os.path.join(parent_dir, directory)
 
@@ -529,12 +529,12 @@ class manager():
                 selectedProduct.setWeight(pWeight)
                 selectedProduct.setDescription(pDescription)
 
-                productFileInfo = (str(selectedProduct.getID()) + ", " + str(pName) + ", " + str(pSellingPrice) + ", " + str(pOS) + ", " 
-                                + str(pQuantity) + ", " + str(selectedProduct.getQuantitySold()) + ", " + str(selectedProduct.getProfit()) + ", " 
+                productFileInfo = (str(selectedProduct.getID()) + ", " + str(pName) + ", " + str(pSellingPrice) + ", " + str(pOS) + ", "
+                                + str(pQuantity) + ", " + str(selectedProduct.getQuantitySold()) + ", " + str(selectedProduct.getProfit()) + ", "
                                 + str(pBoughtPrice) + ", " + str(pWeight) + ", " + str(selectedProduct.getRating()) + "\n")
                 print(productFileInfo)
 
-                productImagesInfo = (str(selectedProduct.getID()) + ", " + str(selectedProduct.getImages()[0]) + ", " + str(selectedProduct.getImages()[1]) + ", " + str(selectedProduct.getImages()[2]) + ", " 
+                productImagesInfo = (str(selectedProduct.getID()) + ", " + str(selectedProduct.getImages()[0]) + ", " + str(selectedProduct.getImages()[1]) + ", " + str(selectedProduct.getImages()[2]) + ", "
                                 + str(selectedProduct.getImages()[3]) + ", " + str(selectedProduct.getImages()[4]) + "\n")
                 print(productImagesInfo)
 
@@ -550,7 +550,7 @@ class manager():
                     if str(selectedProduct.getID()) in line:
                         line = productImagesInfo
                     sys.stdout.write(line)
-                
+
                 for line in fileinput.input("../Resources/Data/Products/products_descriptions.txt", inplace=1):
                     if str(selectedProduct.getID()) in line:
                         line = productDescriptionInfo
@@ -585,11 +585,11 @@ class manager():
                         break
 
                 self.allStoreProducts.remove(selectedProduct)
-                
+
                 selected = self.ui.Products_tableWidget.currentRow()
                 self.ui.Products_tableWidget.removeRow(selected)
 
-                pFiles = ["../Resources/Data/Products/products.txt", "../Resources/Data/Products/products_descriptions.txt", 
+                pFiles = ["../Resources/Data/Products/products.txt", "../Resources/Data/Products/products_descriptions.txt",
                           "../Resources/Data/Products/products_images.txt", "../Resources/Data/Products/productsWeightPrice.txt"]
 
                 # remove product line
@@ -600,13 +600,13 @@ class manager():
                         sys.stdout.write(line)
 
                 # remove blank spaces
-                for fileName in pFiles:  
+                for fileName in pFiles:
                     with open(fileName) as filehandle:
                         lines = filehandle.readlines()
 
                     with open(fileName, 'w') as filehandle:
                         lines = filter(lambda x: x.strip(), lines)
-                        filehandle.writelines(lines) 
+                        filehandle.writelines(lines)
 
             else:
                 print("Select Product to remove.")
@@ -653,7 +653,7 @@ class manager():
                     if str(complaint[2]) in line: # if user is found get warning
                         complaint.append(line.split(", ")[1])
                     sys.stdout.write(line)
-            
+
             # get status
             for complaint in allComplaints:
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
@@ -664,7 +664,7 @@ class manager():
 
             row = 0
             column = 0
-            for complaint in allComplaints: 
+            for complaint in allComplaints:
                 self.ui.Complaints_tableWidget.insertRow(row)
                 for column in range(6):
                     # complaintID, userID, name, userType, warnings, userStatus
@@ -770,7 +770,7 @@ class manager():
                     storeClerksFile = "../Resources/Data/storeClerks.txt"
                     deliveryCompanyFile = "../Resources/Data/deliveryCompanies.txt"
                     customersFile = "../Resources/Data/customers.txt"
-                    
+
                     for line in fileinput.input(storeClerksFile, inplace=1):
                         if str(selected.getToUserID()) in line:
                             complaintTo = line.split(", ")[2]
@@ -780,7 +780,7 @@ class manager():
                         if str(selected.getToUserID()) in line:
                             complaintTo = line.split(", ")[2]
                         sys.stdout.write(line)
-                    
+
                     for line in fileinput.input(customersFile, inplace=1):
                         if str(selected.getFromUserID()) in line:
                             complaintFrom = line.split(", ")[1]
@@ -799,7 +799,7 @@ class manager():
                     self.ui.Complaint_MessageToUser_lineEdit.setText(str(complaintMessage))
 
                     print(selected.getToUserWarnings())
-        
+
         except Exception as e:
             print('Cannot proceed, something went wrong.\n', e)
 
@@ -819,13 +819,13 @@ class manager():
 
                 if(selected != None):
                     self.allUsersComplaints.remove(selected)
-                    
+
                     selectedRow = self.ui.Complaints_tableWidget.currentRow()
                     self.ui.Complaints_tableWidget.removeRow(selectedRow)
 
-                    pFiles = ["../Resources/Data/UsersComplaints/usersComplaints.txt", "../Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt", 
+                    pFiles = ["../Resources/Data/UsersComplaints/usersComplaints.txt", "../Resources/Data/UsersComplaints/usersComplaintsDescriptions.txt",
                               "../Resources/Data/UsersComplaints/usersComplaintsJustifications.txt", "../Resources/Data/UsersComplaints/usersComplaintsMessages.txt"]
-                    
+
                     # remove product line
                     for fileName in pFiles:
                         for line in fileinput.input(fileName, inplace=1):
@@ -834,13 +834,13 @@ class manager():
                             sys.stdout.write(line)
 
                     # remove blank spaces
-                    for fileName in pFiles:  
+                    for fileName in pFiles:
                         with open(fileName) as filehandle:
                             lines = filehandle.readlines()
 
                         with open(fileName, 'w') as filehandle:
                             lines = filter(lambda x: x.strip(), lines)
-                            filehandle.writelines(lines) 
+                            filehandle.writelines(lines)
 
             else:
                 print("Select Complaint to remove.")
@@ -896,7 +896,7 @@ class manager():
             self.allStoreClerks = self.setAllStoreClerks()
 
             row = 0
-            for data in self.allStoreClerks: 
+            for data in self.allStoreClerks:
                 self.ui.StoreClerks_tableWidget.insertRow(row)
                 # accessCode, ID, name, status, email
                 self.ui.StoreClerks_tableWidget.setItem(row, 0, QTableWidgetItem(str(data.getAccessCode())))
@@ -923,7 +923,7 @@ class manager():
                     line = newline.split(", ")
                     allClerks.append(line)
             myfile.close()
-            
+
             # add all
             if len(allClerks) > 0:
                 for pData in allClerks:
@@ -956,7 +956,7 @@ class manager():
             self.ui.StoreClerks_tableWidget.setItem(row, 2, QTableWidgetItem("Name"))
             self.ui.StoreClerks_tableWidget.setItem(row, 3, QTableWidgetItem("Active"))
             self.ui.StoreClerks_tableWidget.setItem(row, 4, QTableWidgetItem("Email"))
-            
+
             info = (accessCode + ", " + pId + ", Name, Active, Email")
 
             userStatus = pId + ", Active"
@@ -964,7 +964,7 @@ class manager():
             with open("../Resources/Data/storeClerks.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(info)
-            
+
             with open("../Resources/Data/UsersComplaints/usersStatus.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(userStatus)
@@ -989,11 +989,11 @@ class manager():
                         break
 
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
-                    if str(selected.getID()) in line: 
+                    if str(selected.getID()) in line:
                         line = str(line.split(", ")[0]) + ", " + "Blocked\n"
                     sys.stdout.write(line)
-                
-                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", " 
+
+                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", "
                           + str(selected.getName()) + ", Blocked" + ", " + str(selected.getEmail()) + "\n")
                 for line in fileinput.input("../Resources/Data/storeClerks.txt", inplace=1):
                     if str(selected.getID()) in line:
@@ -1022,11 +1022,11 @@ class manager():
 
                 selected.setStatus()
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
-                    if str(selected.getID()) in line: 
+                    if str(selected.getID()) in line:
                         line = str(line.split(", ")[0]) + ", " + "Active\n"
                     sys.stdout.write(line)
 
-                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", " 
+                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", "
                           + str(selected.getName()) + ", Active" + ", " + str(selected.getEmail()) + "\n")
                 for line in fileinput.input("../Resources/Data/storeClerks.txt", inplace=1):
                     if str(selected.getID()) in line:
@@ -1057,7 +1057,7 @@ class manager():
                     allDeliveryCompanies.append(line)
 
             myfile.close()
-            
+
             # add all
             if len(allDeliveryCompanies) > 0:
                 for pData in allDeliveryCompanies:
@@ -1077,7 +1077,7 @@ class manager():
 
             print(self.allDeliveryCompanies)
             row = 0
-            for data in self.allDeliveryCompanies: 
+            for data in self.allDeliveryCompanies:
                 self.ui.DeliveryCompany_tableWidget.insertRow(row)
                 # accessCode, ID, name, status, email
                 self.ui.DeliveryCompany_tableWidget.setItem(row, 0, QTableWidgetItem(str(data.getAccessCode())))
@@ -1111,7 +1111,7 @@ class manager():
             self.ui.DeliveryCompany_tableWidget.setItem(row, 2, QTableWidgetItem("Name"))
             self.ui.DeliveryCompany_tableWidget.setItem(row, 3, QTableWidgetItem("Active"))
             self.ui.DeliveryCompany_tableWidget.setItem(row, 4, QTableWidgetItem("Email"))
-            
+
             info = (accessCode + ", " + pId + ", Name, Active, Email")
 
             userStatus = pId + ", Active"
@@ -1119,7 +1119,7 @@ class manager():
             with open("../Resources/Data/storeClerks.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(info)
-            
+
             with open("../Resources/Data/UsersComplaints/usersStatus.txt", "a") as a_file:
                 a_file.write("\n")
                 a_file.write(userStatus)
@@ -1144,11 +1144,11 @@ class manager():
                         break
 
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
-                    if str(selected.getID()) in line: 
+                    if str(selected.getID()) in line:
                         line = str(line.split(", ")[0]) + ", " + "Blocked\n"
                     sys.stdout.write(line)
-                
-                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", " 
+
+                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", "
                           + str(selected.getName()) + ", Blocked" + ", " + str(selected.getEmail()) + "\n")
                 for line in fileinput.input("../Resources/Data/deliveryCompanies.txt", inplace=1):
                     if str(selected.getID()) in line:
@@ -1177,11 +1177,11 @@ class manager():
 
                 selected.setStatus()
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
-                    if str(selected.getID()) in line: 
+                    if str(selected.getID()) in line:
                         line = str(line.split(", ")[0]) + ", " + "Active\n"
                     sys.stdout.write(line)
 
-                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", " 
+                lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", "
                           + str(selected.getName()) + ", Active" + ", " + str(selected.getEmail()) + "\n")
                 for line in fileinput.input("../Resources/Data/deliveryCompanies.txt", inplace=1):
                     if str(selected.getID()) in line:
@@ -1229,7 +1229,7 @@ class manager():
             self.allCustomers = self.setAllCustomers()
 
             row = 0
-            for data in self.allCustomers: 
+            for data in self.allCustomers:
                 self.ui.Customers_tableWidget.insertRow(row)
                 # ID, name, status, email
                 self.ui.Customers_tableWidget.setItem(row, 0, QTableWidgetItem(str(data.getID())))
@@ -1256,10 +1256,10 @@ class manager():
                         break
 
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
-                    if str(selected.getID()) in line: 
+                    if str(selected.getID()) in line:
                         line = str(line.split(", ")[0]) + ", " + "Blocked\n"
                     sys.stdout.write(line)
-                
+
                 lineInfo  = (str(selected.getID()) + ", " + str(selected.getName()) + ", Blocked" + ", " + str(selected.getEmail()) + "\n")
                 for line in fileinput.input("../Resources/Data/customers.txt", inplace=1):
                     if str(selected.getID()) in line:
@@ -1287,10 +1287,10 @@ class manager():
                         break
 
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
-                    if str(selected.getID()) in line: 
+                    if str(selected.getID()) in line:
                         line = str(line.split(", ")[0]) + ", " + "Active\n"
                     sys.stdout.write(line)
-                
+
                 lineInfo  = (str(selected.getID()) + ", " + str(selected.getName()) + ", Active" + ", " + str(selected.getEmail()) + "\n")
                 # print(lineInfo)
                 for line in fileinput.input("../Resources/Data/customers.txt", inplace=1):
@@ -1317,7 +1317,7 @@ class manager():
                         l = lines.split(", ")
                         allAvoidUsers.append(l)
                     sys.stdout.write(line)
-            
+
             # add all
             if len(allAvoidUsers) > 0:
                 for pData in allAvoidUsers:
@@ -1338,7 +1338,7 @@ class manager():
 
             print("All avoid users", self.allAvoidList)
             row = 0
-            for data in self.allAvoidList: 
+            for data in self.allAvoidList:
                 self.ui.AvoidList_tableWidget.insertRow(row)
                 # ID, name, status, email
                 self.ui.AvoidList_tableWidget.setItem(row, 0, QTableWidgetItem(str(data.getID())))
@@ -1366,7 +1366,7 @@ class manager():
 
                 selected.setStatus()
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
-                    if str(selected.getID()) in line: 
+                    if str(selected.getID()) in line:
                         line = str(line.split(", ")[0]) + ", " + "Active\n"
                     sys.stdout.write(line)
 
@@ -1374,13 +1374,13 @@ class manager():
                 filesName = ["../Resources/Data/customers.txt", "../Resources/Data/deliveryCompanies.txt", "../Resources/Data/storeClerks.txt"]
                 for fileName in filesName:
                     for line in fileinput.input(fileName, inplace=1):
-                        if str(selected.getID()) in line: 
+                        if str(selected.getID()) in line:
                             line = lineInfo
                         sys.stdout.write(line)
 
 
                 self.allAvoidUsers.remove(selected)
-                    
+
                 s = self.ui.AvoidList_tableWidget.currentRow()
                 self.ui.AvoidList_tableWidget.removeRow(s)
 
@@ -1404,7 +1404,7 @@ class storeProduct():
         self.description = description
         self.rating = rating
         self.weight = weight
-        
+
         self.setRating()
 
     def getID(self):
@@ -1421,7 +1421,7 @@ class storeProduct():
 
     def getQuantity(self):
         return str(int(self.quantity) - int(self.sold))
-        
+
     def getQuantitySold(self):
         return self.sold
 
@@ -1443,7 +1443,7 @@ class storeProduct():
     def getDescription(self):
         return self.description
 
-    
+
     def setID(self, ID):
         self.ID = ID
 

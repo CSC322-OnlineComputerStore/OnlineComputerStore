@@ -2808,6 +2808,12 @@ class Ui_Homepage(object):
         sizePolicy.setHeightForWidth(self.cartTableWidget.sizePolicy().hasHeightForWidth())
         self.cartTableWidget.setSizePolicy(sizePolicy)
         self.cartTableWidget.setStyleSheet("font-size: 20pt;")
+<<<<<<< HEAD
+=======
+        self.cartTableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.cartTableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.cartTableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
         self.cartTableWidget.setObjectName("cartTableWidget")
         self.cartTableWidget.setColumnCount(4)
         self.cartTableWidget.setRowCount(2)
@@ -3135,8 +3141,13 @@ class Ui_Homepage(object):
         self.menuBar.addAction(self.menuHome.menuAction())
 
         self.retranslateUi(Homepage)
+<<<<<<< HEAD
         self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget_2.setCurrentIndex(1)
+=======
+        self.stackedWidget.setCurrentIndex(6)
+        self.stackedWidget_2.setCurrentIndex(0)
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
         self.stackedWidget2.setCurrentIndex(7)
         self.profilePageItem1comboBox.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Homepage)
@@ -3435,4 +3446,7 @@ if __name__ == "__main__":
     ui.setupUi(Homepage)
     Homepage.show()
     sys.exit(app.exec_())
+<<<<<<< HEAD
 
+=======
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6

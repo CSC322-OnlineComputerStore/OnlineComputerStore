@@ -37,9 +37,13 @@
      <number>0</number>
     </property>
     <item alignment="Qt::AlignVCenter">
+<<<<<<< HEAD
      <widget class="QStackedWidget" name="LoginRegister_stackedWidget">
+=======
+     <widget class="QStackedWidget" name="stackedWidget">
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
       <property name="currentIndex">
-       <number>0</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="LoginRegisterPage">
        <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -76,7 +80,11 @@
                  <string/>
                 </property>
                 <property name="pixmap">
+<<<<<<< HEAD
                  <pixmap>../../../../Local/Resources/Icons/XPACE_LOGO.png</pixmap>
+=======
+                 <pixmap>OnlineComputerStore-randy_dev/Resources/Icons/XPACE_LOGO.png</pixmap>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -107,7 +115,11 @@
                  <string/>
                 </property>
                 <property name="pixmap">
+<<<<<<< HEAD
                  <pixmap>../../../../Local/Resources/Icons/Computer-2.png</pixmap>
+=======
+                 <pixmap>OnlineComputerStore-randy_dev/Resources/Icons/Computer-2.png</pixmap>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -261,12 +273,20 @@ QPushButton:pressed {
         </item>
        </layout>
       </widget>
+<<<<<<< HEAD
       <widget class="QWidget" name="comboBoxLoginPage">
+=======
+      <widget class="QWidget" name="comboBoxOptionsPage">
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
        <layout class="QVBoxLayout" name="verticalLayout_17">
         <item>
          <widget class="QFrame" name="frame_16">
           <property name="styleSheet">
+<<<<<<< HEAD
            <string notr="true">color: rgb(0, 0, 0);</string>
+=======
+           <string notr="true"/>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
           </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
@@ -274,6 +294,7 @@ QPushButton:pressed {
           <property name="frameShadow">
            <enum>QFrame::Raised</enum>
           </property>
+<<<<<<< HEAD
           <layout class="QVBoxLayout" name="verticalLayout_21" stretch="0,1,10">
            <item>
             <widget class="QFrame" name="frame_19">
@@ -635,6 +656,125 @@ QPushButton:pressed {
             </widget>
            </item>
           </layout>
+=======
+          <widget class="QFrame" name="frame_17">
+           <property name="geometry">
+            <rect>
+             <x>130</x>
+             <y>200</y>
+             <width>301</width>
+             <height>201</height>
+            </rect>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <widget class="QComboBox" name="comboBoxUsers">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>39</y>
+              <width>152</width>
+              <height>32</height>
+             </rect>
+            </property>
+            <item>
+             <property name="text">
+              <string>Customer</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Manager</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Store Clerk</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Delivery Company</string>
+             </property>
+            </item>
+           </widget>
+           <widget class="QPushButton" name="ContinuepushButton">
+            <property name="geometry">
+             <rect>
+              <x>7</x>
+              <y>105</y>
+              <width>97</width>
+              <height>32</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Continue</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QFrame" name="frame_18">
+           <property name="geometry">
+            <rect>
+             <x>210</x>
+             <y>50</y>
+             <width>121</width>
+             <height>91</height>
+            </rect>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <widget class="QLabel" name="label_4">
+            <property name="geometry">
+             <rect>
+              <x>13</x>
+              <y>13</y>
+              <width>31</width>
+              <height>16</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Logo</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QFrame" name="frame_19">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>10</y>
+             <width>121</width>
+             <height>51</height>
+            </rect>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <widget class="QPushButton" name="RegisterBack_pushButton_5">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>10</y>
+              <width>113</width>
+              <height>32</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>go back</string>
+            </property>
+           </widget>
+          </widget>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
          </widget>
         </item>
        </layout>
@@ -730,7 +870,11 @@ QPushButton:pressed {
                  <string/>
                 </property>
                 <property name="pixmap">
+<<<<<<< HEAD
                  <pixmap>../../../../Local/Resources/Icons/XPACE_LOGO.png</pixmap>
+=======
+                 <pixmap>OnlineComputerStore-randy_dev/Resources/Icons/XPACE_LOGO.png</pixmap>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -1101,7 +1245,11 @@ QPushButton:pressed {
                  <string/>
                 </property>
                 <property name="pixmap">
+<<<<<<< HEAD
                  <pixmap>../../../../Local/Resources/Icons/XPACE_LOGO.png</pixmap>
+=======
+                 <pixmap>OnlineComputerStore-randy_dev/Resources/Icons/XPACE_LOGO.png</pixmap>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -1424,7 +1572,11 @@ QPushButton:pressed {
                  <string/>
                 </property>
                 <property name="pixmap">
+<<<<<<< HEAD
                  <pixmap>../../../../Local/Resources/Icons/XPACE_LOGO.png</pixmap>
+=======
+                 <pixmap>OnlineComputerStore-randy_dev/Resources/Icons/XPACE_LOGO.png</pixmap>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>
@@ -1821,7 +1973,11 @@ QPushButton:pressed {
                  <string/>
                 </property>
                 <property name="pixmap">
+<<<<<<< HEAD
                  <pixmap>../../../../Local/Resources/Icons/XPACE_LOGO.png</pixmap>
+=======
+                 <pixmap>OnlineComputerStore-randy_dev/Resources/Icons/XPACE_LOGO.png</pixmap>
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>

@@ -1,0 +1,19 @@
+productID, name, sellingPrice, OS, quantity, sold, profit, boughtPrice
+00001, Windows1, $1300, Windows, 5, 0, 0, 0
+00002, Windows2, $1050, Windows, 5, 0, 0, 0 
+00003, Mac Pro, $1600, Mac OS, 5, 0, 0, 0 
+00004, Mac Air 2, $1100, Mac OS, 5, 0, 0, 0 
+00005, Chrome 1, $1000, Chrome, 5, 0, 0, 0 
+00006, Mac Air 3, $1400, Mac OS, 5, 0, 0, 0
+00007, Chrome 2, $1200, Chrome, 5, 0, 0, 0
+00008, Mac Air 4, $1500, Mac OS, 5, 0, 0, 0
+00009, Mac Air 5, $1700, Mac OS, 5, 0, 0, 0
+00010, Mac Air 6, $1450, Mac OS, 5, 0, 0, 0
+00011, Chrome 3, $1500, Chrome, 5, 0, 0, 0
+00012, Chrome 4, $1600, Chrome, 5, 0, 0, 0
+00013, Chrome 5, $1320, Chrome, 5, 0, 0, 0
+00014, Chrome 6, $1300, Chrome, 5, 0, 0, 0
+00015, Windows3, $1400, Windows, 5, 0, 0, 0
+00016, Windows4, $1800, Windows, 5, 0, 0, 0
+00017, Windows5, $1480, Windows, 5, 0, 0, 0
+00018, Windows6, $1780, Windows, 5, 0, 0, 0

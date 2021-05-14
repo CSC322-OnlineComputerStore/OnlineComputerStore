@@ -1,3 +1,7 @@
 Chrome, chrome.png
 MAC OS, macbook-pro.png
 WINDOWS, windows.png
+<<<<<<< HEAD
+=======
+4
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6

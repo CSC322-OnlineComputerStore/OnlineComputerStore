@@ -34,6 +34,10 @@ class registered:
         self.ui.helpButton.clicked.connect(self.show_help_page)
         self.ui.cartbutton.clicked.connect(self.show_cart_page)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
         
 #-------------profilepage relationships using stackedWidget2 -------------
 
@@ -91,8 +95,15 @@ class registered:
         self.ordersNumber = 0 #sets the number of orders a user has
       
         #--users will have to finalize order when they press buy, after they finalize they will be taken to the profile page
+<<<<<<< HEAD
         self.ui.submitFinalizeOrderbutton.clicked.connect(self.show_profile_page)
     
+=======
+#        self.ui.submitFinalizeOrderbutton.clicked.connect(self.show_profile_page)
+    
+        self.ui.confirmPayment.clicked.connect(self.show_confirm_order)
+
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
         self.ui.chatHistoryButton.clicked.connect(self.showMessagesPage)
         
         self.ui.conversationWidgetTable.selectionModel().selectionChanged.connect(self.set_selectedConversation)
@@ -103,7 +114,11 @@ class registered:
 #        self.ui.submitFinalizeOrderbutton.clicked.connect(lambda x: self.clearCart(self.file))
         
         
+<<<<<<< HEAD
         self.ui.submitFinalizeOrderbutton.clicked.connect(self.newOrder)
+=======
+        self.ui.confirmPayment.clicked.connect(self.newOrder)
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
         self.ui.ordersTableWidget.selectionModel().selectionChanged.connect(self.set_selectedOrder)
        
         # cart table dimensions
@@ -278,6 +293,12 @@ class registered:
             l=lines
         return l
         
+<<<<<<< HEAD
+=======
+    def show_confirm_order(self):
+        self.ui.stackedWidget.setCurrentWidget(self.ui.page_3)
+
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
 #------------------------code to write the users orders and display them in a table--------------------
      
   
@@ -535,7 +556,11 @@ class registered:
         else: # if there are items in the cart and therefore the order than the order can be finalized
             self.file = file
             self.showPopUpMessage("Finalize Order", "Please finalize your order")
+<<<<<<< HEAD
             self.ui.stackedWidget.setCurrentWidget(self.ui.finalizeOrderpage)
+=======
+            self.ui.stackedWidget.setCurrentWidget(self.ui.confirmPaymentPage)
+>>>>>>> 53519810826bcf11ef870cbfdc8f91422b6f80d6
             
     #will read the cart and also write the new order on the order table
     def clearCart(self, file):
