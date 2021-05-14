@@ -1,4 +1,3 @@
-AccessCode, ID, name, status, email
-SAC1000, S0, Jose Martes, Blocked, josem01@gmail.com
-SAC1001, S1, John Smith, Blocked, johnm01@gmail.com
-SAC1002, S2, Luis Rambo, Blocked, luism01@gmail.com
+accessCode, ID, name, status, email
+SAC1000, S0, John Smith, Active, smith001@gmail.com
+SAC1001, S1, Joseph Lucas, Active, lucas001@gmail.com

@@ -1,4 +1,4 @@
 TopOS
+Linux
 Windows
-macOS
 Chrome

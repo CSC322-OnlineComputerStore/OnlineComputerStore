@@ -1,8 +1,8 @@
 userID, Status
 C0, Active
 C1, Active
-S0, Blocked
-S1, Blocked
-S2, Blocked
-D0, Blocked
-D1, Blocked
+S0, Active
+S1, Active
+D0, Active
+D1, Active
+S2, Active

@@ -48,8 +48,6 @@ class manager():
 
         self.displayAllProducts()
 
-        self.displayAllComplaints()
-
         self.menu_buttons = [self.ui.Products_pushButton, self.ui.Orders_pushButton,
                              self.ui.Complaints_pushButton,self.ui.StoreClerks_pushButton, self.ui.DeliveryCompanies_pushButton,
                              self.ui.Customers_pushButton, self.ui.AvoidList_pushButton, self.ui.TabooList_pushButton]
@@ -88,6 +86,9 @@ class manager():
 
         # Display Product Info
         self.ui.Products_tableWidget.selectionModel().selectionChanged.connect(self.displayProductInfo)
+        
+        # Display all complaints
+        self.ui.Complaints_pushButton.clicked.connect(self.displayAllComplaints)
 
         # Display Complaints Info
         self.ui.Complaints_tableWidget.selectionModel().selectionChanged.connect(self.displayComplaintInfo)
@@ -131,11 +132,11 @@ class manager():
         # Activate Customer
         self.ui.Customer_Activate_pushButton.clicked.connect(self.activateCustomer)
 
-        # Display Avoid List
-        self.ui.AvoidList_pushButton.clicked.connect(self.displayAvoidList)
+        # # Display Avoid List
+        # self.ui.AvoidList_pushButton.clicked.connect(self.displayAvoidList)
 
         # Activate User
-        self.ui.AvoidList_Activate_pushButton.clicked.connect(self.activateUser)
+        # self.ui.AvoidList_Activate_pushButton.clicked.connect(self.activateUser)
 
     def openPage(self, page, button):
         try:
@@ -492,9 +493,6 @@ class manager():
             selectedProduct.setImages((int(imageNumber)-1),imageName)
             # print(selectedProduct.getImages())
 
-            for p in self.allStoreProducts:
-                print(p.getImages())
-
         except Exception as e:
             print('addProductImage(): Cannot proceed, something went wrong.\n', e)
 
@@ -664,7 +662,6 @@ class manager():
                         complaint.append(line.split(", ")[1])
                     sys.stdout.write(line)
 
-            print(allComplaints)
             row = 0
             column = 0
             for complaint in allComplaints: 
@@ -691,7 +688,6 @@ class manager():
                     newline = singleLine.strip()
                     line = newline.split(", ")
                     allComplaintsData.append(line)
-
             myfile.close()
 
             # ID, description
@@ -706,7 +702,6 @@ class manager():
                     line = newline.split(", ", 1)
                     del line[0]
                     allDescriptions.append(line[0])
-
             myfile.close()
 
             # ID, justification
@@ -721,6 +716,7 @@ class manager():
                     line = newline.split(", ", 1)
                     del line[0]
                     allJustification.append(line[0])
+            myfile.close()
 
             # ID, messages to user
             myfile = open("../Resources/Data/UsersComplaints/usersComplaintsMessages.txt", "r")
@@ -734,7 +730,8 @@ class manager():
                     line = newline.split(", ", 1)
                     del line[0]
                     allMessages.append(line[0])
-            
+            myfile.close()
+
             # add all
             if len(allComplaintsData) > 0:
                 i = 0
@@ -743,8 +740,6 @@ class manager():
                     d.append(allJustification[i])
                     d.append(allMessages[i])
                     i += 1
-                
-                myfile.close()
 
                 for pData in allComplaintsData:
                     # 0:complaintID, 1:fromUserID, 2:toUserID, 3:toUserType, 4:toUserStatus, 5:toUserWarnings, 6:description, 7:justification, 8:messageToUser
@@ -853,7 +848,7 @@ class manager():
             print('Cannot proceed, something went wrong')
 
     def addWarningToUser(self):
-        try:
+        # try:
             index = self.ui.Complaints_tableWidget.currentIndex()
             NewIndex = self.ui.Complaints_tableWidget.model().index(index.row(), 0)
             ctId = self.ui.Complaints_tableWidget.model().data(NewIndex)
@@ -870,13 +865,13 @@ class manager():
                     # get ToUserID in warnings
                     if str(selected.getToUserID()) in line: # if user is found add warning
                         warnings = int(line.split(", ")[1])+1
-                        line = str(line.split(", ")[0]) + ", " + str(int(warnings))
+                        line = str(line.split(", ")[0]) + ", " + str(int(warnings)) + "\n"
                     sys.stdout.write(line)
 
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersComplaintsMessages.txt", inplace=1):
                     # get complaint ID in file
                     if str(selected.getComplaintID()) in line:
-                        line = str(line.split(", ")[0]) + ", " + self.ui.Complaint_MessageToUser_lineEdit.text()
+                        line = str(line.split(", ", 1)[0]) + ", " + self.ui.Complaint_MessageToUser_lineEdit.text() + "\n"
                     sys.stdout.write(line)
 
                 if(warnings >= 3):
@@ -889,10 +884,8 @@ class manager():
                 self.displayAllComplaints()
                 self.allUsersComplaints = self.setAllComplaints()
 
-
-
-        except:
-            print('Cannot proceed, something went wrong')
+        # except:
+        #     print('Cannot proceed, something went wrong')
 
 #-------------Store Clerks Page Functions-------------#
 
@@ -929,7 +922,6 @@ class manager():
                     newline = singleLine.strip()
                     line = newline.split(", ")
                     allClerks.append(line)
-
             myfile.close()
             
             # add all
@@ -995,7 +987,6 @@ class manager():
                     if(p.getID() == pId):
                         selected = p
                         break
-                print("S", selected.getStatus())
 
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
                     if str(selected.getID()) in line: 
@@ -1152,7 +1143,6 @@ class manager():
                         selected = p
                         break
 
-                print(selected.getID())
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
                     if str(selected.getID()) in line: 
                         line = str(line.split(", ")[0]) + ", " + "Blocked\n"
@@ -1160,7 +1150,6 @@ class manager():
                 
                 lineInfo  = (str(selected.getAccessCode()) + ", " + str(selected.getID()) + ", " 
                           + str(selected.getName()) + ", Blocked" + ", " + str(selected.getEmail()) + "\n")
-                print(lineInfo)
                 for line in fileinput.input("../Resources/Data/deliveryCompanies.txt", inplace=1):
                     if str(selected.getID()) in line:
                         line = lineInfo
@@ -1209,20 +1198,19 @@ class manager():
 #-------------Customers Page Functions-------------#
     def setAllCustomers(self):
         try:
+            allCust = []
+            allObjects = []
             myfile = open("../Resources/Data/customers.txt", "r")
             next(myfile)
             lines = myfile.readlines()
-            allCust = []
-            allObjects = []
 
             for singleLine in lines:
                 if singleLine != "\n":
                     newline = singleLine.strip()
                     line = newline.split(", ")
                     allCust.append(line)
-
             myfile.close()
-            
+
             # add all
             if len(allCust) > 0:
                 for pData in allCust:
@@ -1267,14 +1255,12 @@ class manager():
                         selected = p
                         break
 
-                print(selected.getID())
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
                     if str(selected.getID()) in line: 
                         line = str(line.split(", ")[0]) + ", " + "Blocked\n"
                     sys.stdout.write(line)
                 
                 lineInfo  = (str(selected.getID()) + ", " + str(selected.getName()) + ", Blocked" + ", " + str(selected.getEmail()) + "\n")
-                print(lineInfo)
                 for line in fileinput.input("../Resources/Data/customers.txt", inplace=1):
                     if str(selected.getID()) in line:
                         line = lineInfo
@@ -1287,7 +1273,7 @@ class manager():
         #     print(' Cannot proceed, something went wrong', e)
 
     def activateCustomer(self):
-        try:
+        # try:
             indexes = self.ui.Customers_tableWidget.selectionModel().selectedRows()
             if(len(indexes) > 0):
                 index = self.ui.Customers_tableWidget.currentIndex()
@@ -1300,13 +1286,13 @@ class manager():
                         selected = p
                         break
 
-                selected.setStatus()
                 for line in fileinput.input("../Resources/Data/UsersComplaints/usersStatus.txt", inplace=1):
                     if str(selected.getID()) in line: 
                         line = str(line.split(", ")[0]) + ", " + "Active\n"
                     sys.stdout.write(line)
-
+                
                 lineInfo  = (str(selected.getID()) + ", " + str(selected.getName()) + ", Active" + ", " + str(selected.getEmail()) + "\n")
+                # print(lineInfo)
                 for line in fileinput.input("../Resources/Data/customers.txt", inplace=1):
                     if str(selected.getID()) in line:
                         line = lineInfo
@@ -1316,8 +1302,8 @@ class manager():
             else:
                 print("Select Customer to Activate.")
 
-        except Exception as e:
-            print(' Cannot proceed, something went wrong', e)
+        # except Exception as e:
+        #     print(' Cannot proceed, something went wrong', e)
 
 #-------------Avoid List--------------#
     def setAvoidList(self):
@@ -1327,11 +1313,10 @@ class manager():
             allObjects = []
             for fileName in filesName:
                 for line in fileinput.input(fileName, inplace=1):
-                    if str("Blocked") in line: 
-                        allAvoidUsers.append(lines.split(", "))
+                    if str("Blocked") in line:
+                        l = lines.split(", ")
+                        allAvoidUsers.append(l)
                     sys.stdout.write(line)
-
-            print("B:", allAvoidUsers)
             
             # add all
             if len(allAvoidUsers) > 0:
@@ -1347,20 +1332,20 @@ class manager():
 
     def displayAvoidList(self):
         # try:
-                self.ui.AvoidList_tableWidget.setRowCount(0)
+            self.ui.AvoidList_tableWidget.setRowCount(0)
 
-                self.allAvoidList = self.setAvoidList()
+            self.allAvoidList = self.setAvoidList()
 
-                print(self.allAvoidList)
-                row = 0
-                for data in self.allAvoidList: 
-                    self.ui.AvoidList_tableWidget.insertRow(row)
-                    # ID, name, status, email
-                    self.ui.AvoidList_tableWidget.setItem(row, 0, QTableWidgetItem(str(data.getID())))
-                    self.ui.AvoidList_tableWidget.setItem(row, 1, QTableWidgetItem(str(data.getName())))
-                    self.ui.AvoidList_tableWidget.setItem(row, 2, QTableWidgetItem(str(data.getStatus())))
-                    self.ui.AvoidList_tableWidget.setItem(row, 3, QTableWidgetItem(str(data.getEmail())))
-                    row = row+1
+            print("All avoid users", self.allAvoidList)
+            row = 0
+            for data in self.allAvoidList: 
+                self.ui.AvoidList_tableWidget.insertRow(row)
+                # ID, name, status, email
+                self.ui.AvoidList_tableWidget.setItem(row, 0, QTableWidgetItem(str(data.getID())))
+                self.ui.AvoidList_tableWidget.setItem(row, 1, QTableWidgetItem(str(data.getName())))
+                self.ui.AvoidList_tableWidget.setItem(row, 2, QTableWidgetItem(str(data.getStatus())))
+                self.ui.AvoidList_tableWidget.setItem(row, 3, QTableWidgetItem(str(data.getEmail())))
+                row = row+1
 
             # except Exception as e:
             #     print('Cannot proceed, something went wrong.', e)

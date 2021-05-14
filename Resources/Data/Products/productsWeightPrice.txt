@@ -1,4 +1,4 @@
 productID, name, price, weight
-P0, Product1, 300, 5
-P1, Product2, 1700, 4
-P2, Product3, 999, 4.5
+
+P0, None, 0, 0
+P1, None, 0, 0
