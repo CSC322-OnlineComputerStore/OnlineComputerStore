@@ -25,3 +25,5 @@ Store Clerk Dashboard:
 
 App Admin Dashboard:
 /AdminDashboard/Admin.py
+
+Notes: The system may not work the same way as our local files.
