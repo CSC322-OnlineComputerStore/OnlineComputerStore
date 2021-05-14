@@ -1,0 +1,5 @@
+productID, name, sellingPrice, OS, quantity, sold, profit, boughtPrice, weight, rating
+
+P0, None, 0, None, 0, 0, 0, 0, 0, None
+P1, None, 0, None, 0, 0, 0, 0, 0, None
+P2, None, 0, None, 0, 0, 0, 0, 0, None

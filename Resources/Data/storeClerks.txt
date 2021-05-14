@@ -1,0 +1,5 @@
+accessCode, ID, name, status, email
+SAC1000, S0, John Smith, Active, smith001@gmail.com
+SAC1001, S1, Joseph Lucas, Active, lucas001@gmail.com
+
+SAC1002, S2, Name, Active, Email

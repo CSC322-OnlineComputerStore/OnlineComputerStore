@@ -1,0 +1,3 @@
+complaintID, description
+CT0, I don't like this clerk, he didn't help me.
+CT2, Hasn't respond about my order issue in two weeks.

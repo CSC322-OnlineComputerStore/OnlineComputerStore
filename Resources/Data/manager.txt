@@ -1,0 +1,3 @@
+accessCode, ID, name, status, email
+MAC1000, M0, Jay, Active, jay001@gmail.com
+MAC1001, M1, None, Active, None

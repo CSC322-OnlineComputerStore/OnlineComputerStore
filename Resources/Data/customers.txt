@@ -1,0 +1,3 @@
+ID, name, status, email
+C0, Juan Rodrigez, Active, juanr011@gmail.com
+C1, Joseph Rojas, Active, jrojas00@gmail.com

@@ -1,0 +1,11 @@
+userID, Status
+C0, Active
+C1, Active
+S0, Active
+S1, Active
+D0, Active
+D1, Active
+S2, Active
+S2, Active
+D2, Active
+D3, Active
