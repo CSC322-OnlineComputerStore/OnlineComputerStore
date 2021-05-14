@@ -47,8 +47,23 @@ class clerk_main:
         self.ui.message_table.setColumnWidth(3, 336)
         self.ui.message_table.setColumnWidth(4, 50)
 
+        self.ui.view_complaint_button.clicked.connect(self.show_complaint_page)
+        self.ui.view_warning_button.clicked.connect(self.show_warning_page)
+        self.ui.account_info_button.clicked.connect(self.show_account_info_page)
+        self.show_account_info_page
+
         #send message
         self.ui.send_button.clicked.connect(self.newmessage_set)
+
+    def show_account_info_page(self):
+        self.ui.stackedWidget.setCurrentWidget(self.ui.account_info_page)
+        self.ui.header_label.setText("Account Info")
+    def show_complaint_page(self):
+        self.ui.stackedWidget_2.setCurrentWidget(self.ui.complaint_page)
+
+    def show_warning_page(self):
+        self.ui.stackedWidget_2.setCurrentWidget(self.ui.warning_page)
+
 
     #ordertab code        
     def show_order_page(self):
@@ -463,4 +478,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     main_win = clerk_main()
     main_win.show()
+    
     sys.exit(app.exec_()) 
